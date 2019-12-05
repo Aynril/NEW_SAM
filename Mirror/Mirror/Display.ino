@@ -2,11 +2,6 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-#ifdef PROGMEM
-#undef PROGMEM
-#define PROGMEM __attribute__((section(".progmem.data")))
-#endif
-
 #define usualDelay 5000       //default delay of side change
 
 float values[] = {
@@ -25,7 +20,7 @@ float values[] = {
   2           //winddirection; 0 for North, 1 for NorthEast... 7 for NorthWest
 };
 
-PROGMEM const String tip[20] = {
+const char *const tip[20] PROGMEM = {
   "Heat up living space",                                               //[0] TempTipBelow15nr1
   "Dress up properly for cold weather",                                 //[1] TempTipBelow15nr2
   "Heat living space but remember to shock-ventilate and close doors",  //[2] TempTip16to20
@@ -53,7 +48,7 @@ PROGMEM const String tip[20] = {
 
 };
 
-PROGMEM const String sensorName[] = {
+const char *const sensorName[] PROGMEM = {
   "Temperature",
   "Humidity",
   "Earth Humidity",
@@ -75,7 +70,9 @@ void printSensorName(String text) {
   lcd.setCursor(0, 0);
   lcd.print(text.c_str());
 }
-void printValue(char* prefix, float value, char* unit, int lineIndex, bool hasTip) {
+void printValue(String prefixIn, float value, String unitIn, int lineIndex, bool hasTip) {
+  const char* prefix = prefixIn.c_str();
+  const char* unit = unitIn.c_str();
   lcd.setCursor(1, lineIndex);
   if (prefix != "") {
     lcd.print(prefix);
@@ -86,7 +83,8 @@ void printValue(char* prefix, float value, char* unit, int lineIndex, bool hasTi
     delay(usualDelay);
   }
 }
-void printTip(char* s, int lineIndex) {
+void printTip(String sin, int lineIndex) {
+  const char* s = sin.c_str();
   if (strlen(s) <= 20) {
     lcd.setCursor(0, lineIndex);
     lcd.print(s);
