@@ -33,7 +33,7 @@ PROGMEM const String tip[] = {
   "",                                                 //[8] HumidityTipOver60
 
   "Water plants out of water butt",               //[9] RainTip0
-/*  "Get your laundry inside",                      //[10] RainTipOver0nr1
+  "Get your laundry inside",                      //[10] RainTipOver0nr1
   "Close windows and doors of living area",       //[11] RainTipOver0nr2
   "How about using rain as water source?",        //[12] RainTipOver0nr3
   "Houseplants might get damaged if put outside", //[13] RainTipOver1000nr1
@@ -45,7 +45,7 @@ PROGMEM const String tip[] = {
   "How about installing solar panels?",           //[18] LightTipNr2
 
   "Try to wear a cap if you leave the house!",    //[19] WindspeedTipOver15kmH
-*/
+
 };
 
 String sensorName[] = {
