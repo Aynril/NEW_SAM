@@ -2,6 +2,11 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
+#ifdef PROGMEM
+#undef PROGMEM
+#define PROGMEM __attribute__((section(".progmem.data")))
+#endif
+
 #define usualDelay 5000       //default delay of side change
 
 float values[] = {
@@ -20,7 +25,7 @@ float values[] = {
   2           //winddirection; 0 for North, 1 for NorthEast... 7 for NorthWest
 };
 
-PROGMEM const String tip[] = {
+PROGMEM const String tip[20] = {
   "Heat up living space",                                               //[0] TempTipBelow15nr1
   "Dress up properly for cold weather",                                 //[1] TempTipBelow15nr2
   "Heat living space but remember to shock-ventilate and close doors",  //[2] TempTip16to20
@@ -48,7 +53,7 @@ PROGMEM const String tip[] = {
 
 };
 
-String sensorName[] = {
+PROGMEM const String sensorName[] = {
   "Temperature",
   "Humidity",
   "Earth Humidity",

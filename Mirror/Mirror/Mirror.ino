@@ -1,25 +1,17 @@
 #include <nRF24L01.h>
 #include <printf.h>
 #include <RF24.h>
-#include <RF24_config.h>  
-#include <SD.h>
+#include <RF24_config.h>
 #include <SPI.h>
-
-#define sdCs 8
 
 extern float values[];
 
-
-bool sdFound = false;
-
-File myFile;
-
 unsigned short displayPage = 0;
 
-unsigned long long startTime = 0;
+unsigned long startTime = 0;
 
 RF24 radio (9, 10);
-const uint64_t address = 0xF0F0F0F0F0;  
+PROGMEM const uint64_t address = 0xF0F0F0F0F0;  
  
 struct RadioPacket {
   uint8_t lpg;
@@ -49,16 +41,16 @@ void initRadio(){
   radioListenMode();
   //attachInterrupt(0, receivedMessage, FALLING);//0 for pin 2 and 1 for pin 3 => these are the only hardware interrupt pins => there are ways to use other pins, but they only work with CHANGE and are a little more difficult
  
-  Serial.println("Setup");
+  /*Serial.println("Setup");
   Serial.print("Mirror: ");
   Serial.print("Radio is ");
   Serial.print(radio.isPVariant());
-  Serial.println(".");
+  Serial.println(".");*/
 }
  
 void receivedMessage(){
   if(radio.available()) {
-    Serial.println("Got message");
+    //Serial.println("Got message");
     radio.read(&_radioData, sizeof(_radioData));
     Serial.println(returnDataString());
 
@@ -85,51 +77,13 @@ void sendMessage(){//parameter is the number writen on the tower
 }
 */
 
-
-void initSD() {
-  if (!SD.begin(sdCs)) {
-    Serial.println("No SD found");
-    sdFound = false;
-  }
-  else {
-    Serial.println("SD found");
-    sdFound = true;
-  }
-
-  if (SD.exists("values.txt")) {
-    Serial.println("File found");
-  }
-  else {
-    Serial.println("File not found");
-    if (sdFound)myFile = SD.open("values.txt", FILE_WRITE);
-    myFile.close();
-  }
-}
-
 void setup() {
   Serial.begin(115200);
   Serial.println("Init begin");
   initRadio();
-  initSD();
   startTime = millis();
   setup2();
   Serial.println("Init done");
-}
-
-void sdSave(String toSave) {
-  if (SD.exists("values.txt") && sdFound) {
-    myFile = SD.open("values.txt", FILE_WRITE);
-    myFile.println(toSave);
-    myFile.close();
-
-    Serial.println("saved Data");
-  }
-  else if (!sdFound) {
-    Serial.println("no SD card found");
-  }
-  else {
-    Serial.println("File does not exist");
-  }
 }
 
 String returnDataString() {
