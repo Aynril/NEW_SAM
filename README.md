@@ -1,4 +1,6 @@
-#- SAM
+# - SAM
+
+
 A project about a fancier kind of weather station
 
 I used some more high-tech sensors and stuff like that
