@@ -41,16 +41,16 @@ void initRadio(){
   radioListenMode();
   //attachInterrupt(0, receivedMessage, FALLING);//0 for pin 2 and 1 for pin 3 => these are the only hardware interrupt pins => there are ways to use other pins, but they only work with CHANGE and are a little more difficult
  
-  /*Serial.println("Setup");
-  Serial.print("Mirror: ");
-  Serial.print("Radio is ");
+  Serial.println(F("Setup"));
+  Serial.print(F("Mirror: "));
+  Serial.print(F("Radio is "));
   Serial.print(radio.isPVariant());
-  Serial.println(".");*/
+  Serial.println(F("."));
 }
  
 void receivedMessage(){
   if(radio.available()) {
-    //Serial.println("Got message");
+    Serial.println(F("Got message"));
     radio.read(&_radioData, sizeof(_radioData));
     Serial.println(returnDataString());
 
@@ -83,7 +83,7 @@ void setup() {
   initRadio();
   startTime = millis();
   setup2();
-  Serial.println("Init done");
+  Serial.println(F("Init done"));
 }
 
 String returnDataString() {
