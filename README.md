@@ -1,6 +1,6 @@
 # SAM
 
-This is the current version (December 11th, 2019; 22.55)
+This is the current version (January 17th, 2020; 22.27)
 
 ## A project about a fancier kind of weather station
 
