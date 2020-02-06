@@ -1,6 +1,6 @@
 # SAM
 
-This is the current version (December 11th, 2019; 22.55)
+This is the current version (January 17th, 2020; 22.27)
 
 ## A project about a fancier kind of weather station
 
@@ -21,3 +21,12 @@ So as you can see I used my summer vacation quite intensely and I´m looking for
 A huge thanks to all helpers. Especially to:
 
 Julius, Mattis, Konsti, Isi:)
+
+
+
+If you are rebuilding SAM at the moment... AWESOME! Here are the links to all libraries for you to download:
+https://github.com/nRF24/RF24                          <Radio library>
+   <library for pressure sensor>
+Install <BMP280>(Adafruit) <DHT>(Adafruit) <Sleep_n0m1>(Noah Shibley, Michael Grant) library from Adafruit as described below.
+
+In the Arduino IDE go to Sketch >> Include libraries >> Manage libraries and search for the name written in <> above. Note the author, some use differend keywords (you can of course use other libraries but note that you have to change the code then)
