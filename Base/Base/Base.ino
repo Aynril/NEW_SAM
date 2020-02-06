@@ -1,20 +1,27 @@
+/////////////
+//LIBRARIES//
+/////////////
+
 #include <nRF24L01.h>
-//#include <printf.h>
 #include <RF24.h>
-//#include <RF24_config.h>
 #include <Adafruit_BMP280.h>
 #include <MQ2.h>
 #include <DHT.h>
-#include <Adafruit_Sensor.h>
 #include <SPI.h>
+#include <SD.h>
 #include <Arduino.h>
 #include <Sleep_n0m1.h>
+
+//////////////
+//ATTRIBUTES//
+//////////////
 
 #define inputMQ2 A0
 #define inputRainSensor A1
 #define inputLightSensor A2
 #define inputEarthSensor A3
 #define inputDHT22 6
+#define SDPin 8
 #define P25 4
 #define P10 5
 #define LOG_PERIOD 60000
@@ -34,7 +41,26 @@ unsigned long counts;
 unsigned long previousMillis;
 unsigned long sleepTime;
 bool altSend = false;
+bool SDinitialized = false;
 
+////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////IMPORTANT/////
+////////////////////////////////////////////////////////////////////////
+
+//If you have no SD card included, please comment out the line below!
+
+#define sdBuiltIn true
+
+//If you have no radio included, please comment out the line below!
+
+//#define radioBuiltIn true
+
+
+/////////
+//RADIO//
+/////////
+
+#ifdef radioBuiltIn
 
 RF24 radio (9, 10);
 const uint64_t address = 0xF0F0F0F0F0;
@@ -53,51 +79,81 @@ struct RadioPacket {
   uint8_t p10;
   uint8_t radiation;
 };
- 
+
 RadioPacket _radioData;
 
-void initRadio(){
+////////
+//INIT//
+////////
+
+void initRadio() {
   radio.begin();
   radio.setPALevel(RF24_PA_MIN);//tmp => cus of power reasons, should be changed to high later to strengthen signal
   radio.setDataRate(RF24_1MBPS);//test RF24_250KBPS later maybe, but i dunno (only works with + variants), this method return a boolean that indicates the success of the setFunktion
   radio.setAutoAck(false);//cus we want >1 devices to listen to this message... think about it a bit, it will make sense
   radio.disableCRC();//maybe this line is not needed, but i dunno
- 
+
   //radio.maskIRQ(1, 1, 0);//only interrupt in reviecing data
   radioListenMode();
   //attachInterrupt(0, receivedMessage, FALLING);//0 for pin 2 and 1 for pin 3 => these are the only hardware interrupt pins => there are ways to use other pins, but they only work with CHANGE and are a little more difficult
- 
+
   Serial.println("Setup");
   Serial.print("Base: ");
   Serial.print("Radio is ");
   Serial.print(radio.isPVariant());
   Serial.println(".");
 }
- /*
-void receivedMessage(){
+/*
+  void receivedMessage(){
   if(radio.available()) {
-    Serial.println("Got message");
-    radio.read(&_radioData, sizeof(_radioData));
+   Serial.println("Got message");
+   radio.read(&_radioData, sizeof(_radioData));
   } else{
-    Serial.println("ERROR: Interrupt triggered, even thought there is no message out there.");
+   Serial.println("ERROR: Interrupt triggered, even thought there is no message out there.");
   }
-}
- */
-void radioListenMode(){
+  }
+*/
+void radioListenMode() {
   radio.openReadingPipe(0, address);
   radio.startListening();
 }
 
-void radioWriteMode(){
+void radioWriteMode() {
   radio.stopListening();
   radio.openWritingPipe(address);
 }
- 
-void sendMessage(){//parameter is the number writen on the tower
+
+void sendMessage() { //parameter is the number writen on the tower
   radioWriteMode();
   radio.write(&_radioData, sizeof(_radioData));
   radioListenMode();
 }
+
+#endif
+
+#ifdef sdBuiltIn
+
+File myFile;
+
+void initSDCard() {
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(SDPin)) {
+    Serial.println("initialization failed!");
+  }
+  else {
+    Serial.println("initialization done.");
+    SDinitialized = true;
+    myFile = SD.open("data.txt", FILE_WRITE);
+    if (!myFile) {
+      Serial.println("error opening test.txt");
+      SDinitialized = false;
+    }
+    myFile.close();
+  }
+}
+
+#endif
 
 void bmpInit() {
   if (!bmp.begin(0x76, 0x58)) {
@@ -115,7 +171,12 @@ void sensorsInit() {
   Serial.println("Init begin");
   gasSensor.begin();
   dht.begin();
-  initRadio();
+  if (radioBuiltIn) {
+    initRadio();
+  }
+  if(sdBuiltIn){
+    sdInit();
+  }
   pinMode(P25, INPUT);
   pinMode(P10, INPUT);
   bmpInit();
@@ -125,46 +186,53 @@ void sensorsInit() {
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("Hello, you're a cool person! You built your own SAM! We hope you'll have fun with it!");
+  Serial.println("First we're gonna initialise");
   sensorsInit();
+  Serial.println("That was it! let's start reading from the sensors and saving the data (or sending it to your mirror)");
 }
+
+/////////////////////
+//READING FUNCTIONS//
+/////////////////////
 
 void printGas() {
   lpg = gasSensor.readLPG();
   co = gasSensor.readCO();
   smoke = gasSensor.readSmoke();
-  Serial.println("Gas done");
+  Serial.println("Gas Sensor done reading");
 }
 
 void printRain() {
   rainState = analogRead(inputRainSensor);
-  Serial.println("Rain done");
+  Serial.println("Rain Sensor done reading");
 }
 
 void printEarthHumidity() {
   earthState = 1023 - analogRead(inputEarthSensor);
-  Serial.println("Earth done");
+  Serial.println("Earth Humidity Sensor done reading");
 }
 
 void printLightIntensity() {
   lightIntensity = 1023 - analogRead(inputLightSensor);
-  Serial.println("Light done");
+  Serial.println("Light Sensor done reading");
 }
 
 void printAirHumidity() {
   delay(2000);
   airHumidity = dht.readHumidity();
-  Serial.println("AirHum done");
+  Serial.println("Air Humidity Sensor done reading");
 }
 
 void printTemperature() {
   delay(2000);
   temperature = dht.readTemperature();
-  Serial.println("Temp done");
+  Serial.println("Temperature Sensor done reading");
 }
 
 void printPressure() {
   pressure = bmp.readPressure();
-  Serial.println("Press done");
+  Serial.println("Pressure Sensor done reading");
 }
 
 void readParticle(int pin) {
@@ -176,14 +244,14 @@ void readParticle(int pin) {
     Serial.println(pin);
     if (pin == P25) {
       p25Out = micros() - startTime;
-      Serial.println("p25");
     }
+    /*
     else {
       p10Out = micros() - startTime;
-      Serial.println("p10");
     }
+    */
   }
-  else{
+  else {
     Serial.println("Could not read " + String(pin));
   }
 }
@@ -191,7 +259,7 @@ void readParticle(int pin) {
 void printParticle() {
   readParticle(P25);
   //readParticle(P10);
-  Serial.println("Particle done");
+  Serial.println("Particle Sensor done reading");
 }
 
 /*
@@ -212,6 +280,7 @@ void printParticle() {
   }
 */
 
+
 void readValuesFromSensors() {
   printRain();
   printLightIntensity();
@@ -220,7 +289,7 @@ void readValuesFromSensors() {
   printAirHumidity();
   printTemperature();
   printPressure();
-  //printParticle();
+  printParticle();
   //printRadiation();
   saveDataInRadioStorage();
 }
@@ -239,7 +308,23 @@ void saveDataInRadioStorage() {
   _radioData.radiation = radiation;
 }
 
-void setAlternatingPlainValues() {
+void saveData(String msg){
+  if(SDinitialized){
+    myFile = SD.open("data.txt", FILE_WRITE);
+    if(myFile){
+      Serial.println("writing to file");
+      myFile.println(msg);
+      myFile.close();
+      Serial.println("writing done");
+    }
+    else{
+      Serial.println("error opening file");
+    }
+  }
+}
+
+/*
+  void setAlternatingPlainValues() {
   if (altSend) {
     lpg = 1023;
     co = 1023;
@@ -270,9 +355,11 @@ void setAlternatingPlainValues() {
   }
   saveDataInRadioStorage();
   altSend = !altSend;
-}
+  }
+*/
 
-void printRadioDataString() {
+
+void printRadioDataStringAndSaveData() {
   String msg;
   msg = "Radio: ";
   msg += String(_radioData.lpg);
@@ -300,6 +387,7 @@ void printRadioDataString() {
   msg += String(_radioData.radiation);
 
   Serial.println(msg);
+  saveData(msg);
 }
 
 void triggerSleep() {
@@ -309,10 +397,9 @@ void triggerSleep() {
 
 void loop() {
   readValuesFromSensors();
-  //setAlternatingPlainValues();
   saveDataInRadioStorage();
-  printRadioDataString();
+  printRadioDataStringAndSaveData();
   sendMessage();
-  //triggerSleep();
+  triggerSleep();
   delay(2 * 1000);
 }
