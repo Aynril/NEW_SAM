@@ -8,7 +8,7 @@ unsigned short site = 0;
 char *currentTip = (char*) String("Loading..").c_str();
 int currentTipIndex = 0;
 int currentLineIndex = 0;
-bool youMayContinue = true;
+volatile bool youMayContinue = true;
 
 void printSensorName(String text)
 {
