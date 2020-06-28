@@ -1,6 +1,83 @@
 #include <Arduino.h>
 #include <config.h>
 
+#ifdef ESP8266
+
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
+
+const String FirmwareVer = {"1.0"};
+#define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
+#define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
+
+HTTPClient http;
+
+const char *ssid = "ssid";
+const char *password = "password";
+
+void FirmwareUpdate()
+{
+  std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+
+  client->setInsecure();
+  http.begin(*client, URL_fw_Version); // check version URL
+  delay(100);
+  int httpCode = http.GET(); // get data from version file
+  delay(100);
+  String payload;
+  if (httpCode == HTTP_CODE_OK) // if version received
+  {
+    payload = http.getString(); // save received version
+    Serial.println(payload);
+  }
+  else
+  {
+    Serial.print("error in downloading version file:");
+    Serial.println(httpCode);
+  }
+
+  http.end();
+  if (httpCode == HTTP_CODE_OK) // if version received
+  {
+    if (payload.equals(FirmwareVer))
+    {
+      Serial.println("Device already on latest firmware version");
+    }
+    else
+    {
+      Serial.println("New firmware detected");
+
+      // The line below is optional. It can be used to blink the LED on the board during flashing
+      // The LED will be on during download of one buffer of data from the network. The LED will
+      // be off during writing that buffer to flash
+      // On a good connection the LED should flash regularly. On a bad connection the LED will be
+      // on much longer than it will be off. Other pins than LED_BUILTIN may be used. The second
+      // value is used to put the LED on. If the LED is on with HIGH, that value should be passed
+      ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
+
+      t_httpUpdate_return ret = ESPhttpUpdate.update(*client, URL_fw_Bin, "");
+
+      switch (ret)
+      {
+      case HTTP_UPDATE_FAILED:
+        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+        break;
+
+      case HTTP_UPDATE_NO_UPDATES:
+        Serial.println("HTTP_UPDATE_NO_UPDATES");
+        break;
+
+      case HTTP_UPDATE_OK:
+        Serial.println("HTTP_UPDATE_OK");
+        break;
+      }
+    }
+  }
+}
+
+#endif
+
 #ifdef I2C_LCD_SUPPORT
 #include <lcd.h>
 #endif
@@ -22,7 +99,6 @@ os_timer_t LCDTimer;
 #endif
 
 unsigned short displayPage = 0;
-
 
 #if defined(SD_SUPPORT) && defined(ARDUINO)
 #include <SD.h>
@@ -217,7 +293,7 @@ String lightTip()
 #ifdef I2C_LCD_SUPPORT
 void siteInit()
 {
-  #ifdef NRF24_SUPPORT
+#ifdef NRF24_SUPPORT
   lcd.clear();
   printTip(F("Connecting to SAM"), 0);
   if (radioOK)
@@ -249,7 +325,7 @@ void siteInit()
     printTip("Radio Failed", 1);
     delay(5000);
   }
-  #endif
+#endif
 }
 void site1()
 { //Temperature
@@ -398,19 +474,28 @@ void radioCallback(void *pArg)
 #ifdef I2C_LCD_SUPPORT
 void lcdCallback(void *pArg)
 {
-  #ifdef NRF24_SUPPORT
+#ifdef NRF24_SUPPORT
   if (!firstBlood || !radioOK)
   {
     return;
   }
-  
-  #endif
+
+#endif
   displayChange();
 }
 #endif
 
 void espSetup()
 {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print("O");
+  }
+  Serial.println("Connected to WiFi");
+  FirmwareUpdate();
 #ifdef NRF24_SUPPORT
   os_timer_setfn(&RadioTimer, radioCallback, NULL);
   os_timer_arm(&RadioTimer, 500, true);
