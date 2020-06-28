@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.3"};
+const String FirmwareVer = {"1.4"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -50,6 +50,7 @@ void FirmwareUpdate()
     {
       Serial.println("New firmware detected");
 #ifdef I2C_LCD_SUPPORT
+      lcd.clear();
       printTip("Updating Firmware", 0);
       printTip("Cur:" + FirmwareVer + " to " + payload, 1);
       printTip("KEEP POWER ON", 2);
@@ -297,11 +298,12 @@ String lightTip()
 void wifiInitSite()
 {
   lcd.clear();
-  #ifdef ESP8266
+#ifdef ESP8266
+  lcd.clear();
   printTip(F("Connecting to WiFi"), 0);
   printTip(F("Search MAI Mirror"), 1);
   printTip(F("in WiFi Settings"), 2);
-  #endif
+#endif
 }
 void siteInit()
 {
@@ -365,7 +367,7 @@ void site4()
 }
 void site5()
 { //Pressure
-  printSensorName(F("Rain"));
+  printSensorName(F("Pressure"));
   printValue("", pressure, F("HPa"), 1);
 }
 void site6()
@@ -472,11 +474,12 @@ void initLCD()
   lcd.init();
   lcd.backlight();
 #ifdef ESP8266
+  lcd.clear();
   printTip("MAI Mirror", 0);
   printTip("MCU: ESP8266", 1);
   printTip("Version: " + FirmwareVer, 2);
   printTip("mai-robotics.de", 3);
-  delay(1000);
+  delay(3000);
 #endif
 }
 #endif
