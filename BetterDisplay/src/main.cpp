@@ -1,6 +1,10 @@
 #include <Arduino.h>
 #include <config.h>
 
+#ifdef I2C_LCD_SUPPORT
+#include <lcd.h>
+#endif
+
 #ifdef ESP8266
 
 #include <ESP8266WiFi.h>
@@ -8,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.1"};
+const String FirmwareVer = {"1.2"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -45,6 +49,11 @@ void FirmwareUpdate()
     else
     {
       Serial.println("New firmware detected");
+      #ifdef I2C_LCD_SUPPORT
+      printTip("Updating Firmware", 0);
+      printTip("Cur:" + FirmwareVer + " to " + payload, 1);
+      printTip("KEEP POWER ON", 2);
+      #endif
 
       // The line below is optional. It can be used to blink the LED on the board during flashing
       // The LED will be on during download of one buffer of data from the network. The LED will
@@ -74,10 +83,6 @@ void FirmwareUpdate()
   }
 }
 
-#endif
-
-#ifdef I2C_LCD_SUPPORT
-#include <lcd.h>
 #endif
 
 #ifdef ESP8266
