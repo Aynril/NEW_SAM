@@ -57,6 +57,8 @@ void shiftIfNeeded()
   }
   if (currentTipIndex <= 1)
   {
+    currentTipIndex++;
+    lcd.print(currentTip);
     return;
   }
   
