@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.4"};
+const String FirmwareVer = {"1.5"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -98,6 +98,7 @@ os_timer_t RadioTimer; // Verwaltungsstruktur des Timers
 
 #ifdef I2C_LCD_SUPPORT
 os_timer_t LCDTimer;
+os_timer_t ScrollTimer;
 #endif
 
 #endif
@@ -429,6 +430,11 @@ void siteFailure()
 
 void displayChange()
 {
+  if (!youMayContinue)
+  {
+    return;
+  }
+  
   site++;
   if (site > 9)
   {
@@ -504,6 +510,10 @@ void lcdCallback(void *pArg)
 #endif
   displayChange();
 }
+
+void scrollCallback(void *pArg) {
+  shiftIfNeeded();
+}
 #endif
 
 void espSetup()
@@ -545,6 +555,8 @@ void espSetup()
 #ifdef I2C_LCD_SUPPORT
   os_timer_setfn(&LCDTimer, lcdCallback, NULL);
   os_timer_arm(&LCDTimer, usualDelay, true);
+  os_timer_setfn(&ScrollTimer, scrollCallback, NULL);
+  os_timer_arm(&ScrollTimer, 600, true);
 #endif
 }
 #endif

@@ -5,6 +5,11 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 unsigned short site = 0;
 
+char *currentTip = "";
+int currentTipIndex = 0;
+int currentLineIndex = 0;
+bool youMayContinue = true;
+
 void printSensorName(String text)
 {
   lcd.clear();
@@ -29,26 +34,41 @@ void printValue(String prefixIn, float value, String unitIn, int lineIndex)
 void printTip(String sin, int lineIndex)
 {
   const char *s = sin.c_str();
+  currentTip = (char *)s;
+  currentLineIndex = lineIndex;
   if (strlen(s) <= 20)
   {
     lcd.setCursor(0, lineIndex);
     lcd.print(s);
     return;
-  }
-  for (uint8_t i = 0; i < strlen(s) - 19; i++)
+  } else
   {
-
-    String toPrint = "";
-
-    for (int c = 0; c < 20; c++)
-    {
-      toPrint += s[i + c];
-    }
-
-    lcd.setCursor(0, lineIndex);
-    lcd.print(toPrint.c_str());
-    /*     if (i == 0)
-      delay(600);
-    delay(600); */
+    youMayContinue = false;
   }
+  
+}
+
+void shiftIfNeeded()
+{
+  if (strlen(currentTip) <= 20)
+  {
+    youMayContinue = true;
+    return;
+  }
+  if (currentTipIndex >= strlen(currentTip) - 19)
+  {
+    youMayContinue = true;
+    return;
+  }
+
+  String toPrint = "";
+
+  for (int c = 0; c < 20; c++)
+  {
+    toPrint += currentTip[currentTipIndex + c];
+  }
+
+  lcd.setCursor(0, currentLineIndex);
+  lcd.print(toPrint.c_str());
+  currentTipIndex++;
 }
