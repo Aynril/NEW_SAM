@@ -5,7 +5,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 unsigned short site = 0;
 
-char *currentTip = "";
+char *currentTip = (char*) String("Loading..").c_str();
 int currentTipIndex = 0;
 int currentLineIndex = 0;
 bool youMayContinue = true;
@@ -55,9 +55,15 @@ void shiftIfNeeded()
     youMayContinue = true;
     return;
   }
-  if (currentTipIndex >= strlen(currentTip) - 19)
+  if (currentTipIndex <= 1)
+  {
+    return;
+  }
+  
+  if (currentTipIndex >= (int)strlen(currentTip) - 19)
   {
     youMayContinue = true;
+    currentTipIndex = 0;
     return;
   }
 
