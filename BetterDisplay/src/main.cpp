@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.6.2"};
+const String FirmwareVer = {"1.6.3"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -344,6 +344,7 @@ void siteInit()
 }
 void site1()
 { //Temperature
+  lcd.clear();
   printSensorName(F("Temperature"));
   printValue("", temperature, F(" C"), 1);
   printValue("", temperature * 5 / 9 + 32, F(" F"), 2);
@@ -351,39 +352,46 @@ void site1()
 }
 void site2()
 { //Humidity
+  lcd.clear();
   printSensorName(F("Humidity"));
   printValue("", airHumidity, F("%"), 1);
   printTip(humidityTip().c_str(), 3);
 }
 void site3()
 { //Earth Hum
+  lcd.clear();
   printSensorName(F("Earth Humidity"));
   printValue("", map(earthHumidity, 0, 1023, 0, 100), F("%"), 1);
 }
 void site4()
 { //Rain
+  lcd.clear();
   printSensorName(F("Rain"));
   printValue("", map(rain, 0, 1023, 0, 100), F("%"), 1);
   printTip(rainTip().c_str(), 2);
 }
 void site5()
 { //Pressure
+  lcd.clear();
   printSensorName(F("Pressure"));
   printValue("", pressure, F("HPa"), 1);
 }
 void site6()
 { //Light Intensity
+  lcd.clear();
   printSensorName(F("Light Intensity"));
   printValue("", map(light, 0, 1023, 0, 10), F("%"), 1);
 }
 void site7()
 { //PM
+  lcd.clear();
   printSensorName(F("PM Sensor"));
   printValue(F("Size 2.5nm:"), p25, F("ppm"), 1);
   printValue(F("Size 10nm:"), p10, F("ppm"), 2);
 }
 void site8()
 { //Gas
+  lcd.clear();
   printSensorName(F("Gasses"));
   printValue(F("LPG: "), lpg, F("ppm"), 1);
   printValue(F("Methane: "), methane, F("ppm"), 2);
@@ -391,6 +399,7 @@ void site8()
 }
 void site9()
 { //wind
+  lcd.clear();
   printSensorName(F("Wind"));
   printValue(F("Speed: "), windspeed, F("m/s"), 2);
   String printing = F("Direction: ");
@@ -434,7 +443,7 @@ void displayChange()
   {
     return;
   }
-  
+
   site++;
   if (site > 9)
   {
@@ -511,7 +520,8 @@ void lcdCallback(void *pArg)
   displayChange();
 }
 
-void scrollCallback(void *pArg) {
+void scrollCallback(void *pArg)
+{
   shiftIfNeeded();
 }
 #endif

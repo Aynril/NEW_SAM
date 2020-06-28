@@ -36,10 +36,13 @@ void printTip(String sin, int lineIndex)
   const char *s = sin.c_str();
   currentTip = (char *)s;
   currentLineIndex = lineIndex;
+  currentTipIndex = 0;
+
   if (strlen(s) <= 20)
   {
     lcd.setCursor(0, lineIndex);
     lcd.print(s);
+    youMayContinue = true;
     return;
   } else
   {
