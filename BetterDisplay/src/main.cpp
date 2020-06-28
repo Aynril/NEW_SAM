@@ -6,15 +6,13 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
+#include <WiFiManager.h>
 
-const String FirmwareVer = {"1.0"};
+const String FirmwareVer = {"1.1"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
 HTTPClient http;
-
-const char *ssid = "ssid";
-const char *password = "password";
 
 void FirmwareUpdate()
 {
@@ -291,6 +289,12 @@ String lightTip()
 }
 
 #ifdef I2C_LCD_SUPPORT
+void wifiInitSite() {
+  lcd.clear();
+  printTip(F("Connecting to WiFi"), 0);
+  printTip(F("Search MAI Mirror"), 1);
+  printTip(F("in WiFi Settings"), 2);
+}
 void siteInit()
 {
 #ifdef NRF24_SUPPORT
@@ -459,7 +463,6 @@ void initLCD()
 {
   lcd.init();
   lcd.backlight();
-  siteInit();
 }
 #endif
 
@@ -487,14 +490,35 @@ void lcdCallback(void *pArg)
 
 void espSetup()
 {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print("O");
+  WiFiManager wifiManager;
+  #ifdef I2C_LCD_SUPPORT
+  wifiInitSite();
+  #endif
+
+  //exit after config instead of connecting
+  wifiManager.setBreakAfterConfig(true);
+
+  wifiManager.setTimeout(90);
+  //reset settings - for testing
+  //wifiManager.resetSettings();
+
+
+  //tries to connect to last known settings
+  //if it does not connect it starts an access point with the specified name
+  //here  "AutoConnectAP" with password "password"
+  //and goes into a blocking loop awaiting configuration
+  if (!wifiManager.autoConnect("MAI Mirror")) {
+    Serial.println("failed to connect, we should reset as see if it connects");
+    delay(3000);
+    ESP.reset();
+    delay(5000);
   }
+
   Serial.println("Connected to WiFi");
+
+  Serial.println("local ip");
+  Serial.println(WiFi.localIP());
+
   FirmwareUpdate();
 #ifdef NRF24_SUPPORT
   os_timer_setfn(&RadioTimer, radioCallback, NULL);
@@ -511,8 +535,14 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println(F("Init begin"));
+#ifdef I2C_LCD_SUPPORT
+  initLCD();
+#endif
 #ifdef ESP8266
   espSetup();
+#endif
+#ifdef I2C_LCD_SUPPORT
+  siteInit();
 #endif
 #ifdef NRF24_SUPPORT
   initRadio();
@@ -520,10 +550,6 @@ void setup()
 
 #if defined(SD_SUPPORT) && defined(__AVR__)
   initSD();
-#endif
-
-#ifdef I2C_LCD_SUPPORT
-  initLCD();
 #endif
 
   Serial.println(F("Init done"));
