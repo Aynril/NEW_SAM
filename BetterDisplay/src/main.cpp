@@ -1,151 +1,77 @@
 #include <Arduino.h>
-#include <nRF24L01.h>
-#include <printf.h>
-#include <RF24.h>
-#include <RF24_config.h>
-#include <SD.h>
-#include <SPI.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <config.h>
 
-#define SD_CS 8
+#ifdef I2C_LCD_SUPPORT
+#include <lcd.h>
+#endif
 
-#define IRQ 2
-#define CE 9
-#define CSN 10
+#ifdef ESP8266
+extern "C"
+{
+#include "user_interface.h"
+}
 
-File configFile;
+#ifdef NRF24_SUPPORT
+os_timer_t RadioTimer; // Verwaltungsstruktur des Timers
+#endif
 
-#define FILE_NAME "tips.csv"
+#ifdef I2C_LCD_SUPPORT
+os_timer_t LCDTimer;
+#endif
 
-bool sdFound = false;
+#endif
 
 unsigned short displayPage = 0;
 
-unsigned long long startTime = 0;
 
-RF24 radio(CE, CSN);
-const uint64_t address = 0xF0F0F0F0F0;
+#if defined(SD_SUPPORT) && defined(ARDUINO)
+#include <SD.h>
 
-#define usualDelay 5000 //default delay of side change
+#define SD_CS 8
+File configFile;
 
-struct RadioPacket
-{
-  uint8_t lpg;
-  uint8_t methane;
-  uint8_t smoke;
-  uint8_t rain;
-  uint8_t earthHumidity;
-  uint8_t light;
-  uint8_t airHumidity;
-  int8_t temp;
-  float pressure;
-  uint8_t p25;
-  uint8_t p10;
-};
+const char *const FILE_NAME PROGMEM = "tips.csv";
 
-RadioPacket radioData;
+bool sdFound = false;
+#endif
 
-void receivedMessage()
-{
-  if (radio.available())
-  {
-    Serial.println("Got message");
-    radio.read(&radioData, sizeof(radioData));
-    //Serial.println(returnDataString());
-  }
-  else
-  {
-    Serial.println("ERROR: Interrupt triggered, even thought there is no message out there.");
-  }
-}
+#ifdef NRF24_SUPPORT
+#include <nrf24.h>
 
-void radioListenMode()
-{
-  radio.openReadingPipe(0, address);
-  radio.startListening();
-}
+#endif
 
-void initRadio()
-{
-  radio.begin();
-  radio.setPALevel(RF24_PA_MIN); //tmp => cus of power reasons, should be changed to high later to strenghen signal
-  radio.setDataRate(RF24_1MBPS); //test RF24_250KBPS later maybe, but i dunno (only works with + variants), this method return a boolean that indicates the success of the setFunktion
-  radio.setAutoAck(false);       //cus we want >1 devices to listen to this message... think about it a bit, it will make sense
-  radio.disableCRC();            //maybe this line is not needed, but i dunno
-
-  radio.maskIRQ(1, 1, 0); //only interrupt in reviecing data
-  radioListenMode();
-  attachInterrupt(digitalPinToInterrupt(IRQ), receivedMessage, FALLING); //0 for pin 2 and 1 for pin 3 => these are the only hardware interrupt pins => there are ways to use other pins, but they only work with CHANGE and are a little more difficult
-
-  Serial.println("Setup");
-  Serial.print("Mirror: ");
-  Serial.print("Radio is ");
-  Serial.print(radio.isPVariant());
-  Serial.println(".");
-}
-
+#if defined(SD_SUPPORT) && defined(ARDUINO)
 void initSD()
 {
   if (!SD.begin(SD_CS))
   {
-    Serial.println("No SD found");
+    while (1)
+    {
+      delay(500);
+      Serial.println(F("SD not found"));
+    }
     sdFound = false;
   }
   else
   {
-    Serial.println("SD found");
+    Serial.println(F("SD found"));
     sdFound = true;
   }
 
-  if (SD.exists(FILE_NAME))
+  if (SD.exists((char *)FILE_NAME))
   {
-    Serial.println("File found");
+    Serial.println(F("File found"));
   }
   else
   {
-    Serial.println("File not found");
-    if (sdFound)
-      configFile = SD.open(FILE_NAME, FILE_WRITE);
-    configFile.close();
+    while (1)
+    {
+      delay(500);
+      Serial.println(F("File not found"));
+    }
   }
 }
-
-void sdSave(String toSave)
-{
-  if (SD.exists(FILE_NAME) && sdFound)
-  {
-    configFile = SD.open(FILE_NAME, FILE_WRITE);
-    configFile.println(toSave);
-    configFile.close();
-
-    Serial.println("saved Data");
-  }
-  else if (!sdFound)
-  {
-    Serial.println("no SD card found");
-  }
-  else
-  {
-    Serial.println("File does not exist");
-  }
-}
-
-float values[] = {
-    17,   //temp in °C
-    37,   //hum in %
-    530,  //earthHum in x/1023
-    267,  //rain in x/1023
-    1003, //pressure in HPa
-    200,  //lightIntensity in x/1023
-    20,   //pm25 in ppm
-    17,   //pm10 in ppm
-    0,    //lpg in ppm
-    0,    //co in ppm
-    0,    //smoke in ppm
-    5,    //windspeed in m/s
-    2     //winddirection; 0 for North, 1 for NorthEast... 7 for NorthWest
-};
+#endif
 
 const char *const tip[20] PROGMEM = {
     "Heat up living space",                                              //[0] TempTipBelow15nr1
@@ -175,75 +101,9 @@ const char *const tip[20] PROGMEM = {
 
 };
 
-const char *const sensorName[] PROGMEM = {
-    "Temperature",
-    "Humidity",
-    "Earth Humidity",
-    "Rain",
-    "Pressure",
-    "Light Intensity",
-    "PM Sensor",
-    "Gas Sensor",
-    "Wind"};
-
-LiquidCrystal_I2C lcd(0x27, 20, 4);
-
-unsigned short site = 0;
-
-void printSensorName(String text)
-{
-  lcd.clear();
-  //printTime();
-  lcd.setCursor(0, 0);
-  lcd.print(text.c_str());
-}
-void printValue(String prefixIn, float value, String unitIn, int lineIndex, bool hasTip)
-{
-  const char *prefix = prefixIn.c_str();
-  const char *unit = unitIn.c_str();
-  lcd.setCursor(1, lineIndex);
-  if (prefix != "")
-  {
-    lcd.print(prefix);
-  }
-  lcd.print(value);
-  lcd.print(unit);
-  if (!hasTip)
-  {
-    delay(usualDelay);
-  }
-}
-void printTip(String sin, int lineIndex)
-{
-  const char *s = sin.c_str();
-  if (strlen(s) <= 20)
-  {
-    lcd.setCursor(0, lineIndex);
-    lcd.print(s);
-    return;
-  }
-  for (int i = 0; i < strlen(s) - 19; i++)
-  {
-
-    String toPrint = "";
-
-    for (int c = 0; c < 20; c++)
-    {
-      toPrint += s[i + c];
-    }
-
-    lcd.setCursor(0, lineIndex);
-    lcd.print(toPrint.c_str());
-    if (i == 0)
-      delay(600);
-    delay(600);
-  }
-  delay(usualDelay / 4);
-}
-
 String tempTip()
 {
-  if (values[0] < 15)
+  if (temperature < 15)
   {
     if (random(1))
     {
@@ -254,7 +114,7 @@ String tempTip()
       return tip[1];
     }
   }
-  else if (values[0] < 20)
+  else if (temperature < 20)
   { //16 - 20
     return tip[2];
   }
@@ -266,7 +126,7 @@ String tempTip()
 
 String humidityTip()
 {
-  if (values[1] < 40)
+  if (airHumidity < 40)
   { //-40
     if (random(1))
     {
@@ -277,11 +137,11 @@ String humidityTip()
       return tip[5];
     }
   }
-  else if (values[1] < 50)
+  else if (airHumidity < 50)
   { //40-50
     return tip[6];
   }
-  else if (values[1] < 60)
+  else if (airHumidity < 60)
   { //50 - 60
     return tip[7];
   }
@@ -293,11 +153,11 @@ String humidityTip()
 
 String rainTip()
 {
-  if (values[3] < 15)
+  if (rain < 15)
   {
     return tip[9];
   }
-  else if (values[3] < 900)
+  else if (rain < 900)
   {
     if (random(1))
     {
@@ -354,105 +214,116 @@ String lightTip()
   }
 }
 
+#ifdef I2C_LCD_SUPPORT
 void siteInit()
 {
+  #ifdef NRF24_SUPPORT
   lcd.clear();
-  printTip("Connecting to SAM", 0);
-  for (int z = 0; z < 3; z++)
+  printTip(F("Connecting to SAM"), 0);
+  if (radioOK)
   {
-    printTip(".    ", 1);
-    delay(500);
-    printTip("..   ", 1);
-    delay(500);
-    printTip("...  ", 1);
-    delay(500);
-    printTip(".... ", 1);
-    delay(500);
-    printTip(".....", 1);
-    delay(500);
-    printTip(".... ", 1);
-    delay(500);
-    printTip("...  ", 1);
-    delay(500);
-    printTip("..   ", 1);
-    delay(500);
-    printTip(".    ", 1);
-    delay(500);
+    while (!firstBlood)
+    {
+      printTip(F(".    "), 1);
+      delay(500);
+      printTip(F("..   "), 1);
+      delay(500);
+      printTip(F("...  "), 1);
+      delay(500);
+      printTip(F(".... "), 1);
+      delay(500);
+      printTip(F("....."), 1);
+      delay(500);
+      printTip(F(".... "), 1);
+      delay(500);
+      printTip(F("...  "), 1);
+      delay(500);
+      printTip(F("..   "), 1);
+      delay(500);
+      printTip(F(".    "), 1);
+      delay(500);
+    }
   }
+  else
+  {
+    printTip("Radio Failed", 1);
+    delay(5000);
+  }
+  #endif
 }
 void site1()
 { //Temperature
-  printSensorName(sensorName[0]);
-  printValue("", values[0], " C", 1, true);
-  printValue("", values[0] * 5 / 9 + 32, " F", 2, true);
+  printSensorName(F("Temperature"));
+  printValue("", temperature, F(" C"), 1);
+  printValue("", temperature * 5 / 9 + 32, F(" F"), 2);
   printTip(tempTip().c_str(), 3);
 }
 void site2()
 { //Humidity
-  printSensorName(sensorName[1]);
-  printValue("", values[1], "%", 1, true);
+  printSensorName(F("Humidity"));
+  printValue("", airHumidity, F("%"), 1);
   printTip(humidityTip().c_str(), 3);
 }
 void site3()
 { //Earth Hum
-  printSensorName(sensorName[2]);
-  printValue("", map(values[2], 0, 1023, 0, 100), "%", 1, false);
+  printSensorName(F("Earth Humidity"));
+  printValue("", map(earthHumidity, 0, 1023, 0, 100), F("%"), 1);
 }
 void site4()
 { //Rain
-  printSensorName(sensorName[3]);
-  printValue("", map(values[3], 0, 1023, 0, 100), "%", 1, true);
+  printSensorName(F("Rain"));
+  printValue("", map(rain, 0, 1023, 0, 100), F("%"), 1);
   printTip(rainTip().c_str(), 2);
 }
 void site5()
 { //Pressure
-  printSensorName(sensorName[4]);
-  printValue("", values[4], "HPa", 1, false);
+  printSensorName(F("Rain"));
+  printValue("", pressure, F("HPa"), 1);
 }
 void site6()
 { //Light Intensity
-  printSensorName(sensorName[5]);
-  printValue("", map(values[5], 0, 1023, 0, 10), "%", 1, true);
+  printSensorName(F("Light Intensity"));
+  printValue("", map(light, 0, 1023, 0, 10), F("%"), 1);
 }
 void site7()
 { //PM
-  printSensorName(sensorName[6]);
-  printValue("Size 2.5nm:", values[6], "ppm", 1, true);
-  printValue("Size 10nm:", values[7], "ppm", 2, false);
+  printSensorName(F("PM Sensor"));
+  printValue(F("Size 2.5nm:"), p25, F("ppm"), 1);
+  printValue(F("Size 10nm:"), p10, F("ppm"), 2);
 }
 void site8()
 { //Gas
-  printSensorName(sensorName[7]);
-  printValue("LPG: ", values[8], "ppm", 1, true);
-  printValue("CO: ", values[9], "ppm", 2, true);
-  printValue("Smoke: ", values[10], "ppm", 3, false);
+  printSensorName(F("Gasses"));
+  printValue(F("LPG: "), lpg, F("ppm"), 1);
+  printValue(F("Methane: "), methane, F("ppm"), 2);
+  printValue(F("Smoke: "), smoke, F("ppm"), 3);
 }
 void site9()
 { //wind
-  printSensorName(sensorName[8]);
-  printValue("Speed: ", values[11], "m/s", 2, false);
-  String printing = "Direction: ";
-  Serial.println(int(values[12]));
-  switch (int(values[12]))
+  printSensorName(F("Wind"));
+  printValue(F("Speed: "), windspeed, F("m/s"), 2);
+  String printing = F("Direction: ");
+  Serial.println(winddirection);
+  switch (winddirection)
   {
   case 0:
-    printing += "N";
+    printing += F("N");
   case 1:
-    printing += "NE";
+    printing += F("NE");
   case 2:
-    printing += "E";
+    printing += F("E");
   case 3:
-    printing += "SE";
+    printing += F("SE");
   case 4:
-    printing += "S";
+    printing += F("S");
   case 5:
-    printing += "SW";
+    printing += F("SW");
   case 6:
-    printing += "W";
+    printing += F("W");
   case 7:
-    printing += "NW";
+    printing += F("NW");
   default:
-    printing += "N/A";
+    printing += F("N/A");
   }
   lcd.setCursor(1, 3);
   lcd.print(printing.c_str());
@@ -460,10 +331,10 @@ void site9()
 void siteFailure()
 {
   lcd.clear();
-  printTip("Something went wrong", 0);
-  printTip("Our pros are trying", 1);
-  printTip("to fix this problem", 2);
-  printTip("Props to MAI!", 3);
+  printTip(F("Something went wrong"), 0);
+  printTip(F("Our pros are trying"), 1);
+  printTip(F("to fix this problem"), 2);
+  printTip(F("Props to MAI!"), 3);
 }
 
 void displayChange()
@@ -508,28 +379,76 @@ void displayChange()
   }
 }
 
-void setup2()
+void initLCD()
 {
-  Serial.begin(115200);
   lcd.init();
   lcd.backlight();
   siteInit();
 }
+#endif
+
+#ifdef ESP8266
+#ifdef NRF24_SUPPORT
+void radioCallback(void *pArg)
+{
+  receivedMessage();
+}
+#endif
+
+#ifdef I2C_LCD_SUPPORT
+void lcdCallback(void *pArg)
+{
+  #ifdef NRF24_SUPPORT
+  if (!firstBlood || !radioOK)
+  {
+    return;
+  }
+  
+  #endif
+  displayChange();
+}
+#endif
+
+void espSetup()
+{
+#ifdef NRF24_SUPPORT
+  os_timer_setfn(&RadioTimer, radioCallback, NULL);
+  os_timer_arm(&RadioTimer, 500, true);
+#endif
+#ifdef I2C_LCD_SUPPORT
+  os_timer_setfn(&LCDTimer, lcdCallback, NULL);
+  os_timer_arm(&LCDTimer, usualDelay, true);
+#endif
+}
+#endif
 
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("Init begin");
+  Serial.println(F("Init begin"));
+#ifdef ESP8266
+  espSetup();
+#endif
+#ifdef NRF24_SUPPORT
   initRadio();
+#endif
+
+#if defined(SD_SUPPORT) && defined(__AVR__)
   initSD();
-  startTime = millis();
-  setup2();
-  Serial.println("Init done");
+#endif
+
+#ifdef I2C_LCD_SUPPORT
+  initLCD();
+#endif
+
+  Serial.println(F("Init done"));
 }
 
 void loop()
 {
+#if defined(NRF24_SUPPORT) && not defined(INTERRUPT_ENABLED) && not defined(ESP8266)
   receivedMessage();
-  displayChange();
+#endif
+
   delay(10);
 }
