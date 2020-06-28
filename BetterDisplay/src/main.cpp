@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.6.5"};
+const String FirmwareVer = {"1.6.6"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -573,6 +573,8 @@ void espSetup()
 
   Serial.println("local ip");
   Serial.println(WiFi.localIP());
+
+  wifiFinishSite();
 
   FirmwareUpdate();
 #ifdef NRF24_SUPPORT
