@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.2"};
+const String FirmwareVer = {"1.3"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -49,11 +49,11 @@ void FirmwareUpdate()
     else
     {
       Serial.println("New firmware detected");
-      #ifdef I2C_LCD_SUPPORT
+#ifdef I2C_LCD_SUPPORT
       printTip("Updating Firmware", 0);
       printTip("Cur:" + FirmwareVer + " to " + payload, 1);
       printTip("KEEP POWER ON", 2);
-      #endif
+#endif
 
       // The line below is optional. It can be used to blink the LED on the board during flashing
       // The LED will be on during download of one buffer of data from the network. The LED will
@@ -294,11 +294,14 @@ String lightTip()
 }
 
 #ifdef I2C_LCD_SUPPORT
-void wifiInitSite() {
+void wifiInitSite()
+{
   lcd.clear();
+  #ifdef ESP8266
   printTip(F("Connecting to WiFi"), 0);
   printTip(F("Search MAI Mirror"), 1);
   printTip(F("in WiFi Settings"), 2);
+  #endif
 }
 void siteInit()
 {
@@ -468,6 +471,13 @@ void initLCD()
 {
   lcd.init();
   lcd.backlight();
+#ifdef ESP8266
+  printTip("MAI Mirror", 0);
+  printTip("MCU: ESP8266", 1);
+  printTip("Version: " + FirmwareVer, 2);
+  printTip("mai-robotics.de", 3);
+  delay(1000);
+#endif
 }
 #endif
 
@@ -496,9 +506,9 @@ void lcdCallback(void *pArg)
 void espSetup()
 {
   WiFiManager wifiManager;
-  #ifdef I2C_LCD_SUPPORT
+#ifdef I2C_LCD_SUPPORT
   wifiInitSite();
-  #endif
+#endif
 
   //exit after config instead of connecting
   wifiManager.setBreakAfterConfig(true);
@@ -507,12 +517,12 @@ void espSetup()
   //reset settings - for testing
   //wifiManager.resetSettings();
 
-
   //tries to connect to last known settings
   //if it does not connect it starts an access point with the specified name
   //here  "AutoConnectAP" with password "password"
   //and goes into a blocking loop awaiting configuration
-  if (!wifiManager.autoConnect("MAI Mirror")) {
+  if (!wifiManager.autoConnect("MAI Mirror"))
+  {
     Serial.println("failed to connect, we should reset as see if it connects");
     delay(3000);
     ESP.reset();
