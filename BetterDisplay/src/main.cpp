@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.6.4"};
+const String FirmwareVer = {"1.6.5"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -298,7 +298,7 @@ String lightTip()
 #ifdef I2C_LCD_SUPPORT
 void wifiInitSite()
 {
-  lcd.clear();
+  Serial.println("WiFi init site");
 #ifdef ESP8266
   lcd.clear();
   printTip(F("Connecting to WiFi"), 0);
@@ -306,10 +306,24 @@ void wifiInitSite()
   printTip(F("in WiFi Settings"), 2);
 #endif
 }
+
+void wifiFinishSite()
+{
+  Serial.println("WiFi init site");
+#ifdef ESP8266
+  lcd.clear();
+  printTip("Connected to WiFi", 0);
+  printTip("SSID:" + WiFi.SSID(), 1);
+  printTip("IP:" + WiFi.localIP(), 2);
+  printTip("RSSI:" + WiFi.RSSI(), 3);
+  delay(3000);
+#endif
+}
 void siteInit()
 {
 #ifdef NRF24_SUPPORT
   lcd.clear();
+  Serial.println("Site init");
   printTip(F("Connecting to SAM"), 0);
   if (radioOK)
   {
@@ -486,8 +500,10 @@ void displayChange()
 
 void initLCD()
 {
+  Serial.println("Pre LCD");
   lcd.init();
   lcd.backlight();
+  Serial.println("Post LCD");
 #ifdef ESP8266
   lcd.clear();
   printTip("MAI Mirror", 0);
@@ -528,6 +544,7 @@ void scrollCallback(void *pArg)
 
 void espSetup()
 {
+  Serial.println("ESP Setup");
   WiFiManager wifiManager;
 #ifdef I2C_LCD_SUPPORT
   wifiInitSite();
