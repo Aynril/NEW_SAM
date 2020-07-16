@@ -1,0 +1,35 @@
+{
+    "folders": [
+        {
+            "path": "Base"
+        },
+        {
+            "path": "BetterBase"
+        },
+        {
+            "path": "BetterDisplay"
+        },
+        {
+            "path": "Mirror"
+        },
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "atomic": "cpp",
+            "typeinfo": "cpp",
+            "xmemory": "cpp",
+            "xutility": "cpp",
+            "array": "cpp",
+            "deque": "cpp",
+            "list": "cpp",
+            "map": "cpp",
+            "*.tcc": "cpp",
+            "string": "cpp",
+            "unordered_map": "cpp",
+            "vector": "cpp"
+        }
+    }
+}

@@ -1,7 +1,7 @@
 /////////////
 //LIBRARIES//
 /////////////
-
+#include <config.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <Adafruit_BMP280.h>
@@ -11,20 +11,6 @@
 #include <SD.h>
 #include <Arduino.h>
 #include <Sleep_n0m1.h>
-
-//////////////
-//ATTRIBUTES//
-//////////////
-
-#define inputMQ2 A0
-#define inputRainSensor A1
-#define inputLightSensor A2
-#define inputEarthSensor A3
-#define inputDHT22 6
-#define SDPin 8
-#define P25 4
-#define P10 5
-#define LOG_PERIOD 60000
 
 DHT dht(inputDHT22, DHT22);
 Adafruit_BMP280 bmp;
@@ -53,7 +39,7 @@ bool SDinitialized = false;
 
 //If you have no radio included, please comment out the line below!
 
-//#define radioBuiltIn true
+//#define RADIO_SUPPORT true
 
 
 /////////
@@ -171,12 +157,12 @@ void sensorsInit() {
   Serial.println("Init begin");
   gasSensor.begin();
   dht.begin();
-  if (radioBuiltIn) {
-    initRadio();
-  }
-  if(sdBuiltIn){
-    sdInit();
-  }
+  #ifdef RADIO_SUPPORT
+  initRadio();
+  #endif
+  #ifdef SD_SUPPORT
+  sdInit();
+  #endif // SD_SUPPORT
   pinMode(P25, INPUT);
   pinMode(P10, INPUT);
   bmpInit();
