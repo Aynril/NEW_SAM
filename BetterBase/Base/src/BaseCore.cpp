@@ -1,6 +1,11 @@
-#pragma once
+//#pragma once
 
-#include <BaseCore.h>
+#include <Arduino.h>
+#include "BaseCore.h"
+
+#if ENABLED(RADIO_SUPPORT)
+    #include "features/radio/radio.h"
+#endif
 
 void setup() {
 

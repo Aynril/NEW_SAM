@@ -1,4 +1,6 @@
 #pragma once
 
-#include <../.github/.>
-#include <../core/macros.h>
+#include <stdint.h>
+
+#include "../core/macros.h"
+#include "../../Configuration.h"

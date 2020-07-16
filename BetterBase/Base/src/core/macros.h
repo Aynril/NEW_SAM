@@ -247,6 +247,13 @@
 #define SUB9(N) SUB4(SUB5(N))
 #define SUB10(N) SUB5(SUB5(N))
 
+//
+// Primitives supporting precompiler REPEAT
+//
+#define FIRST(a,...)     a
+#define SECOND(a,b,...)  b
+#define THIRD(a,b,c,...) c
+
 #define IS_PROBE(V...) SECOND(V, 0) // Get the second item passed, or 0
 #define PROBE() ~, 1                // Second item will be 1 if this is passed
 #define _NOT_0 PROBE()

@@ -1,22 +1,18 @@
 #pragma once
 
-#ifndef __RADIO_H__
-#define __RADIO_H__
-#endif // !__RADIO_H__
-
 #include <Arduino.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 
-extern unsigned long startTime;
-extern int lpg, methane, smoke;
-extern int earthState, rainState, lightIntensity, airHumidity, temperature;
-extern float pressure;
-extern float p10Out, p25Out;
-extern unsigned long counts;
-extern unsigned long previousMillis;
-extern bool altSend;
-extern bool SDinitialized;
+ unsigned long startTime;
+int methane, smoke;
+ int earthState, rainState, lightIntensity, airHumidity, temperature;
+ float pressure;
+ float p10Out, p25Out;
+ unsigned long counts;
+ unsigned long previousMillis;
+ bool altSend;
+ bool SDinitialized;
 
 struct RadioPacket
 {
@@ -35,5 +31,22 @@ struct RadioPacket
 
 void initRadio();
 void radioWriteMode();
-void saveDataInRadioStorage();
 void sendMessage();
+
+void setLPG(uint8_t lpg);
+
+void setMethane(uint8_t methane);
+
+void setRain(uint8_t rain);
+
+void setEarhtHumidity(uint8_t earthHumidity);
+
+void setLightIntensity(uint8_t lightIntensity);
+
+void setAirHumidity(uint8_t airHumidity);
+
+void setTemperature(int8_t temperature);
+
+void setAirPressure(float pressure);
+
+void setParticles(uint8_t p10, uint8_t p25);

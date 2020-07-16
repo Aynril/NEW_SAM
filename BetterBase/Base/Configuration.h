@@ -17,6 +17,12 @@
 
 #define RADIO_SUPPORT
 
+#if ENABLED(RADIO_SUPPORT)
+    #define RADIO_SENDER_ADDRESS 0x000000
+    #define RADIO_POWER_LEVEL 3
+    // #define RADIO_LOW_POWER_MODE
+#endif
+
 // If you want to see what SAM has to say
 
 #define DEBUG_FEATURE

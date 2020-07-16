@@ -6,4 +6,8 @@
 #define __BASE_FIRMWARE__
 #endif
 
-#include <inc/BaseConfig.h>
+#include "inc/BaseConfig.h"
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
