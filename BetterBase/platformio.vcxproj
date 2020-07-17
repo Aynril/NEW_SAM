@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Path>C:/Program Files (x86)/Common Files/Oracle/Java/javapath;C:/Python38/Scripts/;C:/Python38/;C:/Program Files/Python37/Scripts/;C:/Program Files/Python37/;C:/WINDOWS/system32;C:/WINDOWS;C:/WINDOWS/System32/Wbem;C:/WINDOWS/System32/WindowsPowerShell/v1.0/;C:/WINDOWS/System32/OpenSSH/;C:/Program Files/nodejs/;C:/ProgramData/chocolatey/bin;C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin;C:/Go/bin;C:/Program Files/Docker/Docker/resources/bin;C:/ProgramData/DockerDesktop/version-bin;C:/Gradle/bin;C:/Program Files/Git/cmd;C:/Program Files/dotnet/;C:/Users/juliu/.platformio/penv/Scripts;C:/Program Files/Microsoft SQL Server/130/Tools/Binn/;C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/;C:/Program Files/MySQL/MySQL Shell 8.0/bin/;C:/Users/juliu/AppData/Local/Microsoft/WindowsApps;C:/Users/juliu/AppData/Local/Programs/Microsoft VS Code/bin;C:/Users/juliu/AppData/Roaming/npm;C:/Program Files (x86)/FAHClient;C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2020.1/bin;;C:/Users/juliu/go/bin;C:/Users/juliu/.dotnet/tools;C:/Program Files/JetBrains/CLion 2020.1.2/bin;</Path>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0FA9C3A8-452B-41EF-A418-9102B170F49F}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>platformio -f -c visualstudio run</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>platformio -f -c visualstudio run --target clean</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>PLATFORMIO=40304;ARDUINO_AVR_UNO;__BASE_FIRMWARE__;F_CPU=16000000L;ARDUINO_ARCH_AVR;ARDUINO=10808;__AVR_ATmega328P__</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/include;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/Base;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/SD;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/Sleep_n0m1;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/TroykaMQ/src;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/NRFLite/src;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/RF24;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/RF24/utility;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/Adafruit BMP280 Library;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/Wire/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/SPI/src;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/DHT sensor library;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/Adafruit Unified Sensor;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/cores/arduino;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/variants/standard;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/HID/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/toolchain-atmelavr/lib/gcc/avr/5.4.0/include;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/toolchain-atmelavr/lib/gcc/avr/5.4.0/include-fixed;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/toolchain-atmelavr/avr/include;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/tool-unity</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>platformio run</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>platformio run --target clean</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>PLATFORMIO=40304;ARDUINO_AVR_UNO;__BASE_FIRMWARE__;F_CPU=16000000L;ARDUINO_ARCH_AVR;ARDUINO=10808;__AVR_ATmega328P__</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/include;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/Base;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/SD;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/Sleep_n0m1;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/TroykaMQ/src;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/NRFLite/src;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/RF24;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/RF24/utility;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/Adafruit BMP280 Library;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/Wire/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/SPI/src;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/DHT sensor library;$(HOMEDRIVE)$(HOMEPATH)/GitStuff/NEW_SAM/BetterBase/.pio/libdeps/uno/Adafruit Unified Sensor;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/cores/arduino;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/variants/standard;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/HID/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/toolchain-atmelavr/lib/gcc/avr/5.4.0/include;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/toolchain-atmelavr/lib/gcc/avr/5.4.0/include-fixed;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/toolchain-atmelavr/avr/include;$(HOMEDRIVE)$(HOMEPATH)/.platformio/packages/tool-unity</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+    <None Include="platformio.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/PinoutConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Base/src/BaseCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/src/BaseCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/src/core/macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/src/core/serial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Base/src/features/radio/radio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/src/features/radio/radio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/src/features/sd/sdUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/src/inc/BaseConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base/src/inc/SanityCheck.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
