@@ -4,16 +4,6 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
- unsigned long startTime;
-int methane, smoke;
- int earthState, rainState, lightIntensity, airHumidity, temperature;
- float pressure;
- float p10Out, p25Out;
- unsigned long counts;
- unsigned long previousMillis;
- bool altSend;
- bool SDinitialized;
-
 struct RadioPacket
 {
   uint8_t lpg;
