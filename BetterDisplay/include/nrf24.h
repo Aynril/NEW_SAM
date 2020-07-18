@@ -21,22 +21,27 @@ const uint64_t address PROGMEM = 0xF0F0F0F0F0;
 
 struct RadioPacket
 {
-  uint8_t lpg;
-  uint8_t methane;
-  uint8_t smoke;
+  uint16_t propane;
+  uint16_t methane;
+  uint16_t smoke;
+  uint16_t hydrogen;
+
   uint8_t rain;
   uint8_t earthHumidity;
   uint8_t light;
-  uint8_t airHumidity;
-  int8_t temp;
+
+  float airHumidity;
+  float temp;
+
   float pressure;
+
   uint8_t p25;
   uint8_t p10;
 };
 RadioPacket radioData;
 void saveRadio()
 {
-  lpg = radioData.lpg;
+  lpg = radioData.propane;
   methane = radioData.methane;
   smoke = radioData.smoke;
   rain = radioData.rain;
