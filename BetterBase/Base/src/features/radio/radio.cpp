@@ -32,11 +32,11 @@ void initRadio()
   radio.powerDown();
 #endif
 
-  DEBUG_PRINT("Setup");
-  DEBUG_PRINT("Base: ");
-  DEBUG_PRINT("Radio is ");
-  DEBUG_PRINT(radio.isPVariant());
-  DEBUG_PRINTLN(".");
+  PRINT_DEBUG("Setup");
+  PRINT_DEBUG("Base: ");
+  PRINT_DEBUG("Radio is ");
+  PRINT_DEBUG(radio.isPVariant());
+  PRINT_DEBUG_LN(".");
 }
 
 void radioWriteMode()
@@ -61,14 +61,24 @@ void sendMessage()
 #endif
 }
 
-void setLPG(uint8_t lpg)
+void setPropane(uint16_t propane)
 {
-  radioData.lpg = lpg;
+  radioData.propane = propane;
 }
 
-void setMethane(uint8_t methane)
+void setMethane(uint16_t methane)
 {
   radioData.methane = methane;
+}
+
+void setSmoke(uint16_t smoke)
+{
+  radioData.smoke = smoke;
+}
+
+void setHydrogen(uint16_t hydrogen)
+{
+  radioData.hydrogen = hydrogen;
 }
 
 void setRain(uint8_t rain)
@@ -86,7 +96,7 @@ void setLightIntensity(uint8_t lightIntensity)
   radioData.light = lightIntensity;
 }
 
-void setAirHumidity(uint8_t airHumidity)
+void setAirHumidity(float airHumidity)
 {
   radioData.airHumidity = airHumidity;
 }

@@ -1,20 +1,20 @@
 #pragma once
 
-#define inputMQ2 A0
+#define PINOUT_MQ2_INPUT A0
 
-#define inputRainSensor A1
+#define PINOUT_RAIN_SENSOR_INPUT A1
 
-#define inputLightSensor A2
+#define PINOUT_LIGHT_SENSOR_INPUT A2
 
-#define inputEarthSensor A3
+#define PINOUT_EARTH_HUMIDITY_SENSOR_INPUT A3
 
-#define inputDHT22 6
+#define PINOUT_DHT22_INPUT 6
 
-#define P25 4
-#define P10 5
+#define PINOUT_NOVA_PM_SENSOR_PWM_25 4
+#define PINOUT_NOVA_PM_SENSOR_PWM_10 5
 
 #if ENABLED(SD_SUPPORT)
-#define SDPin 8
+#define PINOUT_SD_CS 8
 #endif
 
 #if ENABLED(RADIO_SUPPORT)

@@ -5,7 +5,7 @@
 
 //If you have no SD card included, please comment out the line below!
 
-#define SD_SUPPORT
+// #define SD_SUPPORT
 
 //If you have no radio included, please comment out the line below!
 
@@ -19,7 +19,7 @@
     // #define RADIO_SINGLE_RECIEVER
 #endif
 
-#define SERIAL_OUTPUT_SUPPORT
+//#define SERIAL_OUTPUT_SUPPORT
 
 // If you want to see what SAM has to say
 

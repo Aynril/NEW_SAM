@@ -6,15 +6,20 @@
 
 struct RadioPacket
 {
-  uint8_t lpg;
-  uint8_t methane;
-  uint8_t smoke;
+  uint16_t propane;
+  uint16_t methane;
+  uint16_t smoke;
+  uint16_t hydrogen;
+
   uint8_t rain;
   uint8_t earthHumidity;
   uint8_t light;
-  uint8_t airHumidity;
-  int8_t temp;
+
+  float airHumidity;
+  float temp;
+
   float pressure;
+
   uint8_t p25;
   uint8_t p10;
 };
@@ -23,9 +28,13 @@ void initRadio();
 void radioWriteMode();
 void sendMessage();
 
-void setLPG(uint8_t lpg);
+void setPropane(uint16_t propane);
 
-void setMethane(uint8_t methane);
+void setMethane(uint16_t methane);
+
+void setSmoke(uint16_t smoke);
+
+void setHydrogen(uint16_t hydrogen);
 
 void setRain(uint8_t rain);
 
@@ -33,9 +42,11 @@ void setEarhtHumidity(uint8_t earthHumidity);
 
 void setLightIntensity(uint8_t lightIntensity);
 
-void setAirHumidity(uint8_t airHumidity);
+
+void setAirHumidity(float airHumidity);
 
 void setTemperature(int8_t temperature);
+
 
 void setAirPressure(float pressure);
 
