@@ -1,20 +1,25 @@
 #include "../inc/BaseConfig.h"
 
+#if ENABLED(DHT_SENSOR_INSTALLED)
 #include "DHTSensor.h"
 
-DHTSensor::DHTSensor() {
+DHTSensor::DHTSensor()
+{
     dht = new DHT(PINOUT_DHT22_INPUT, DHT22);
 }
 
-void DHTSensor::init() {
+void DHTSensor::init()
+{
     dht->begin();
 }
 
-float DHTSensor::getHumidity() {
+float DHTSensor::getHumidity()
+{
     return dht->readHumidity();
 }
 
-float DHTSensor::getTemperature() {
+float DHTSensor::getTemperature()
+{
     return dht->readTemperature();
 }
-
+#endif

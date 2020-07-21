@@ -9,20 +9,25 @@
 
 #include "sensors/SensorManager.h"
 
-void setup() {
-#if ENABLED(DEBUG_FEATURE)
+void setup()
+{
+#if ANY(DEBUG_FEATURE, SERIAL_OUTPUT_SUPPORT)
     Serial.begin(115200);
 #endif
 
-    PRINT_DEBUG_LN("Hi i'm a tree!");
+#if ENABLED(RADIO_SUPPORT)
+    initRadio();
+#endif
 
+    PRINT_DEBUG_LN("Hi i'm a tree!");
 }
 
 SensorManager manager;
 
-void loop() {
+void loop()
+{
     manager.saveAll();
-    #if ENABLED(RADIO_SUPPORT)
+#if ENABLED(RADIO_SUPPORT)
     sendMessage();
-    #endif
+#endif
 }

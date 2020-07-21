@@ -1,4 +1,5 @@
 #include "../inc/BaseConfig.h"
+#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
 #include "AirPressureSensor.h"
 
 void AirPressureSensor::init()
@@ -7,6 +8,11 @@ void AirPressureSensor::init()
     {
         PRINT_DEBUG_LN("Could not find a valid BMP280 sensor!");
     }
+    else
+    {
+        PRINT_DEBUG_LN("Found a valid BMP280")
+    }
+
     // Default settings from datasheet.
     bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     // Operating Mode.
                     Adafruit_BMP280::SAMPLING_X2,     // Temp. oversampling
@@ -15,14 +21,18 @@ void AirPressureSensor::init()
                     Adafruit_BMP280::STANDBY_MS_500); // Standby time.
 }
 
-float AirPressureSensor::getPressure() {
+float AirPressureSensor::getPressure()
+{
     return bmp.readPressure();
 }
 
-float AirPressureSensor::getTemperature() {
+float AirPressureSensor::getTemperature()
+{
     return bmp.readTemperature();
 }
 
-float AirPressureSensor::getAltitute() {
+float AirPressureSensor::getAltitute()
+{
     return bmp.readAltitude();
 }
+#endif

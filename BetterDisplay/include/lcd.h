@@ -46,6 +46,7 @@ void printTip(String sin, int lineIndex)
     return;
   } else
   {
+    lcd.autoscroll();
     lcd.setCursor(0, lineIndex);
     lcd.print(s);
     youMayContinue = false;

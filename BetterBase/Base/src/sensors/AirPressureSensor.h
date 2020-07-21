@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../templates/Singleton.h"
 #include "../inc/BaseConfig.h"
 #include <Adafruit_BMP280.h>
 

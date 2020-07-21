@@ -14,7 +14,9 @@ RadioPacket radioData;
 
 void initRadio()
 {
-  radio.begin();
+  if(!radio.begin()) {
+    PRINT_DEBUG_LN("ERROR: Radio was not initalized");
+  }
   radio.setPALevel(RADIO_POWER_LEVEL);
   radio.setDataRate(RF24_1MBPS);
 
@@ -32,8 +34,8 @@ void initRadio()
   radio.powerDown();
 #endif
 
-  PRINT_DEBUG("Setup");
-  PRINT_DEBUG("Base: ");
+  PRINT_DEBUG_LN("Setup Radio");
+  PRINT_DEBUG_LN("Base: ");
   PRINT_DEBUG("Radio is ");
   PRINT_DEBUG(radio.isPVariant());
   PRINT_DEBUG_LN(".");
