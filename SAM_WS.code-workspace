@@ -30,7 +30,14 @@
             "string": "cpp",
             "unordered_map": "cpp",
             "vector": "cpp",
-            "istream": "cpp"
+            "istream": "cpp",
+            "ios": "cpp"
+        },
+        "files.exclude": {
+            ".idea/": true,
+            "build/": true,
+            "cmake-build-*": true,
+            "CMake*": true
         }
     }
 }

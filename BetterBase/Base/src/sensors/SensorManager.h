@@ -15,7 +15,9 @@
 #if ENABLED(GAS_SENSOR_INSTALLED)
 #include "MQ2Sensor.h"
 #endif
+#if ENABLED(PARTICLE_SENSOR_INSTALLED)
 #include "PMSensor.h"
+#endif
 
 #if ENABLED(RADIO_SUPPORT)
 #include "../features/radio/radio.h"
@@ -40,7 +42,9 @@ private:
 #if ENABLED(GAS_SENSOR_INSTALLED)
     MQ2Sensor mq2Sensor;
 #endif
+#if ENABLED(PARTICLE_SENSOR_INSTALLED)
     PMSensor partilceSensor;
+#endif
 
 #if ENABLED(GAS_SENSOR_INSTALLED)
     uint16_t propane;
@@ -62,8 +66,10 @@ private:
     float pressure;
 #endif
 
+#if ENABLED(PARTICLE_SENSOR_INSTALLED)
     uint8_t p25;
     uint8_t p10;
+#endif
 
 public:
     void saveAll();
@@ -97,8 +103,11 @@ void SensorManager::saveAll()
     temp = pressureSensor.getTemperature();
 #endif
 
+#if ENABLED(PARTICLE_SENSOR_INSTALLED)
     p10 = partilceSensor.get10();
     p25 = partilceSensor.get25();
+#endif
+
 #if ENABLED(RADIO_SUPPORT)
 
 #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
@@ -159,8 +168,10 @@ void SensorManager::saveAll()
     Serial.print((double)temp);
     Serial.print(F(","));
 #endif
+#if ENABLED(PARTICLE_SENSOR_INSTALLED)
     Serial.print(p10);
     Serial.print(F(","));
     Serial.println(p25);
+#endif
 #endif
 }
