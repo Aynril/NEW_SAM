@@ -19,6 +19,13 @@
     // #define RADIO_SINGLE_RECIEVER
 #endif
 
+#define RTC_SUPPORT
+
+#if ENABLED(RTC_SUPPORT)
+    #define RTC_TYPE_D3231
+    //#define RTC_TYPE_D1207
+#endif
+
 #define SERIAL_OUTPUT_SUPPORT
 
 // If you want to see what SAM has to say

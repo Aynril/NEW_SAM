@@ -27,6 +27,14 @@
 #include "../features/sd/sdUtility.h"
 #endif
 
+#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+#include "WindSpeedSensor.h"
+#endif
+
+#if ENABLED(RTC_SUPPORT)
+#include "../features/rtc.h"
+#endif
+
 class SensorManager
 {
 private:
@@ -44,6 +52,9 @@ private:
 #endif
 #if ENABLED(PARTICLE_SENSOR_INSTALLED)
     PMSensor partilceSensor;
+#endif
+#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    WindSpeedSensor *windSpeedSensor = new WindSpeedSensor(PINOUT_WIND_SPEED_SENSOR_INTERRUPT, true);
 #endif
 
 #if ENABLED(GAS_SENSOR_INSTALLED)
@@ -71,9 +82,26 @@ private:
     uint8_t p10;
 #endif
 
+#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    float speed;
+#endif
+
 public:
+    void initAll();
     void saveAll();
 };
+
+void SensorManager::initAll()
+{
+#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    // windSpeedSensor.init(PINOUT_WIND_SPEED_SENSOR_INTERRUPT, true);
+#endif
+
+#if ENABLED(RTC_SUPPORT)
+    initRTC();
+#endif
+
+}
 
 void SensorManager::saveAll()
 {
@@ -108,6 +136,10 @@ void SensorManager::saveAll()
     p25 = partilceSensor.get25();
 #endif
 
+#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    speed = windSpeedSensor->getSpeed(SPEED_KMH);
+#endif
+
 #if ENABLED(RADIO_SUPPORT)
 
 #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
@@ -137,6 +169,10 @@ void SensorManager::saveAll()
 #endif
 
 #if ENABLED(SERIAL_OUTPUT_SUPPORT)
+#if ENABLED(RTC_SUPPORT)
+    Serial.print(getTimeNow());
+    Serial.print(F(","));
+#endif
 #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     Serial.print((double)pressure);
     Serial.print(F(","));
@@ -157,12 +193,12 @@ void SensorManager::saveAll()
     Serial.print(F(","));
 #endif
 
-    Serial.print(rain);
-    Serial.print(F(","));
-    Serial.print(earthHumidity);
-    Serial.print(F(","));
-    Serial.print(light);
-    Serial.print(F(","));
+    // Serial.print(rain);
+    // Serial.print(F(","));
+    // Serial.print(earthHumidity);
+    // Serial.print(F(","));
+    // Serial.print(light);
+    // Serial.print(F(","));
 
 #if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
     Serial.print((double)temp);
@@ -172,6 +208,11 @@ void SensorManager::saveAll()
     Serial.print(p10);
     Serial.print(F(","));
     Serial.println(p25);
+    Serial.print(F(","));
 #endif
+#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    Serial.println(speed);
+#endif
+
 #endif
 }

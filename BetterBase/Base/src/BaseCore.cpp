@@ -9,6 +9,8 @@
 
 #include "sensors/SensorManager.h"
 
+SensorManager manager;
+
 void setup()
 {
 #if ANY(DEBUG_FEATURE, SERIAL_OUTPUT_SUPPORT)
@@ -20,9 +22,8 @@ void setup()
 #endif
 
     PRINT_DEBUG_LN("Hi i'm a tree!");
+    manager.initAll();
 }
-
-SensorManager manager;
 
 void loop()
 {
@@ -30,4 +31,5 @@ void loop()
 #if ENABLED(RADIO_SUPPORT)
     sendMessage();
 #endif
+delay(500);
 }

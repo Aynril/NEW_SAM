@@ -313,3 +313,5 @@
 #define RREPEAT(N, OP) RREPEAT_S(0, N, OP)
 #define RREPEAT2_S(S, N, OP, V...) EVAL1024(_RREPEAT2(S, SUB##S(N), OP, V))
 #define RREPEAT2(N, OP, V...) RREPEAT2_S(0, N, OP, V)
+
+#define countof(a) (sizeof(a) / sizeof(a[0]))
