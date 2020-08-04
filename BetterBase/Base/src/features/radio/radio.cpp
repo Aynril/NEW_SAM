@@ -47,7 +47,7 @@ void radioWriteMode()
   PRINT_DEBUG("Open writing Pipe at adress ");
   PRINT_DEBUG_HEX(RADIO_SENDER_ADDRESS);
   PRINT_DEBUG_LN("");
-  radio.openWritingPipe((const uint8_t *)RADIO_SENDER_ADDRESS);
+  radio.openWritingPipe(RADIO_SENDER_ADDRESS);
 }
 
 void sendMessage()
@@ -58,7 +58,7 @@ void sendMessage()
 #endif
 
   radioWriteMode();
-  radio.write(&radioData, sizeof(radioData));
+  PRINT_DEBUG_LN(radio.write(&radioData, sizeof(radioData)));
 
 #if ENABLED(RADIO_LOW_POWER_MODE)
   delay(15);

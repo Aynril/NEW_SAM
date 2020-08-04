@@ -21,7 +21,7 @@ TMRh20 2014
 RF24 radio(7,8);                        // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
 /***************************************************************/
-const uint64_t address = 0xF0F0F0F0F0;
+const uint64_t address = 0x4209696;
 struct RadioPacket
 {
   uint8_t lpg;
