@@ -17,7 +17,7 @@ bool firstBlood = true;
 #endif
 
 RF24 radio(CE, CSN);
-const uint64_t address PROGMEM = 0xF0F0F0F0F0;
+const uint64_t address PROGMEM = 0x4209696;
 
 struct RadioPacket
 {

@@ -70,11 +70,15 @@ private:
 
 #if ENABLED(DHT_SENSOR_INSTALLED)
     float airHumidity;
+#endif
+
+#if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
     float temp;
 #endif
 
 #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     float pressure;
+    float height;
 #endif
 
 #if ENABLED(PARTICLE_SENSOR_INSTALLED)
@@ -101,12 +105,20 @@ void SensorManager::initAll()
     initRTC();
 #endif
 
+#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    pressureSensor.init();
+#endif
+
+#if ENABLED(DHT_SENSOR_INSTALLED)
+    dhtSensor.init();
+#endif
 }
 
 void SensorManager::saveAll()
 {
 #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     pressure = pressureSensor.getPressure();
+    height = pressureSensor.getAltitute();
 #endif
 #if ENABLED(DHT_SENSOR_INSTALLED)
     airHumidity = dhtSensor.getHumidity();
@@ -164,7 +176,9 @@ void SensorManager::saveAll()
     setTemperature(temp);
 #endif
 
+#if ENABLED(PARTICLE_SENSOR_INSTALLED)
     setParticles(p10, p25);
+#endif
 
 #endif
 
@@ -175,6 +189,8 @@ void SensorManager::saveAll()
 #endif
 #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     Serial.print((double)pressure);
+    Serial.print(F(","));
+    Serial.print((double)height);
     Serial.print(F(","));
 #endif
 #if ENABLED(DHT_SENSOR_INSTALLED)

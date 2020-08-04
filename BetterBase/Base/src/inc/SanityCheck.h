@@ -31,6 +31,6 @@
 #undef TEST3
 #undef TEST4
 
-#if NONE(SD_SUPPORT, RADIO_SUPPORT, SERIAL_OUTPUT_SUPPORT)
+#if NONE(SD_SUPPORT, RADIO_SUPPORT, SERIAL_OUTPUT_SUPPORT, DEBUG_FEATURE)
 #error "Neither SD, Radio nor Serial is enabled. Code is useless"
 #endif

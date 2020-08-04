@@ -10,7 +10,7 @@ void AirPressureSensor::init()
     }
     else
     {
-        PRINT_DEBUG_LN("Found a valid BMP280")
+        PRINT_DEBUG_LN("Found a valid BMP280");
     }
 
     // Default settings from datasheet.
@@ -23,7 +23,7 @@ void AirPressureSensor::init()
 
 float AirPressureSensor::getPressure()
 {
-    return bmp.readPressure();
+    return bmp.readPressure() / 100;
 }
 
 float AirPressureSensor::getTemperature()

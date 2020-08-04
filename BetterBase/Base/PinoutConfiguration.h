@@ -20,6 +20,6 @@
 #endif
 
 #if ENABLED(RADIO_SUPPORT)
-#define PINOUT_RADIO_CE 10
-#define PINOUT_RADIO_CSN 9
+#define PINOUT_RADIO_CE 7
+#define PINOUT_RADIO_CSN 8
 #endif

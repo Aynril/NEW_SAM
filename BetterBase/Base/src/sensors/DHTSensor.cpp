@@ -2,10 +2,11 @@
 
 #if ENABLED(DHT_SENSOR_INSTALLED)
 #include "DHTSensor.h"
+#include "../core/serial.h"
 
 DHTSensor::DHTSensor()
 {
-    dht = new DHT(PINOUT_DHT22_INPUT, DHT22);
+    dht = new DHT(PINOUT_DHT22_INPUT, DHT11);
 }
 
 void DHTSensor::init()
@@ -15,11 +16,17 @@ void DHTSensor::init()
 
 float DHTSensor::getHumidity()
 {
-    return dht->readHumidity();
+    float ret = dht->readHumidity();
+    PRINT_DEBUG("DHT Humidity: ");
+    PRINT_DEBUG_LN(ret);
+    return ret;
 }
 
 float DHTSensor::getTemperature()
 {
-    return dht->readTemperature();
+    float ret = dht->readTemperature();
+    PRINT_DEBUG("DHT Temperature: ");
+    PRINT_DEBUG_LN(ret);
+    return ret;
 }
 #endif

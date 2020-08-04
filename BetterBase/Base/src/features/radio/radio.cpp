@@ -36,7 +36,7 @@ void initRadio()
 
   PRINT_DEBUG_LN("Setup Radio");
   PRINT_DEBUG_LN("Base: ");
-  PRINT_DEBUG("Radio is ");
+  PRINT_DEBUG("Is Radio Plus Variant");
   PRINT_DEBUG(radio.isPVariant());
   PRINT_DEBUG_LN(".");
 }
@@ -44,6 +44,9 @@ void initRadio()
 void radioWriteMode()
 {
   radio.stopListening();
+  PRINT_DEBUG("Open writing Pipe at adress ");
+  PRINT_DEBUG_HEX(RADIO_SENDER_ADDRESS);
+  PRINT_DEBUG_LN("");
   radio.openWritingPipe((const uint8_t *)RADIO_SENDER_ADDRESS);
 }
 

@@ -16,6 +16,9 @@ typedef struct
     int count;
 } Wind_Data_t;
 
+#define TICKS_PER_ROTATION 2
+#define WIND_SENSOR_RADIUS 90 /* mm */ / 10 /*(cm)*/
+
 class WindSpeedSensor
 {
 private:
