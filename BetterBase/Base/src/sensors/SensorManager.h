@@ -51,7 +51,7 @@ private:
     MQ2Sensor mq2Sensor;
 #endif
 #if ENABLED(PARTICLE_SENSOR_INSTALLED)
-    PMSensor partilceSensor;
+    SDS011 partilceSensor;
 #endif
 #if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
     WindSpeedSensor *windSpeedSensor = new WindSpeedSensor(PINOUT_WIND_SPEED_SENSOR_INTERRUPT, true);
