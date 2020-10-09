@@ -11,3 +11,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#if ENABLED(LOW_POWER_FUNCTION_SUPPORTED)
+#include "features/LowPower.h"
+#endif

@@ -56,20 +56,22 @@ String printTime(const RtcDateTime &dt)
 void initRTC()
 {
 #if ENABLED(RTC_TYPE_D3231)
+    PRINT_DEBUG_LN("Initializing D3231 RTC");
     RTC.Begin();
 
     RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
     PRINT_DEBUG_LN(printTime(compiled));
-    PRINT_DEBUG_LN();
+    PRINT_DEBUG_LN("------");
 
     if (!RTC.IsDateTimeValid())
     {
+        PRINT_DEBUG_LN("[RTC] Some sort of Time Problem detected!");
         if (RTC.LastError() != 0)
         {
             // we have a communications error
             // see https://www.arduino.cc/en/Reference/WireEndTransmission for
             // what the number means
-            PRINT_DEBUG("RTC communications error = ");
+            PRINT_DEBUG("[RTC] RTC communications error = ");
             PRINT_DEBUG_LN(RTC.LastError());
         }
         else
@@ -78,7 +80,7 @@ void initRTC()
             //    1) first time you ran and the device wasn't running yet
             //    2) the battery on the device is low or even missing
 
-            PRINT_DEBUG_LN("RTC lost confidence in the DateTime!");
+            PRINT_DEBUG_LN("[RTC] RTC lost confidence in the DateTime!");
 
             // following line sets the RTC to the date & time this sketch was compiled
             // it will also reset the valid flag internally unless the Rtc device is
@@ -87,26 +89,27 @@ void initRTC()
             RTC.SetDateTime(compiled);
         }
     }
+    PRINT_DEBUG_LN("[RTC] Passed validation of time!");
 
     if (!RTC.GetIsRunning())
     {
-        PRINT_DEBUG_LN("RTC was not actively running, starting now");
+        PRINT_DEBUG_LN("[RTC] RTC was not actively running, starting now");
         RTC.SetIsRunning(true);
     }
 
     RtcDateTime now = RTC.GetDateTime();
     if (now < compiled)
     {
-        PRINT_DEBUG_LN("RTC is older than compile time!  (Updating DateTime)");
+        PRINT_DEBUG_LN("[RTC] RTC is older than compile time!  (Updating DateTime)");
         RTC.SetDateTime(compiled);
     }
     else if (now > compiled)
     {
-        PRINT_DEBUG_LN("RTC is newer than compile time. (this is expected)");
+        PRINT_DEBUG_LN("[RTC] RTC is newer than compile time. (this is expected)");
     }
     else if (now == compiled)
     {
-        PRINT_DEBUG_LN("RTC is the same as compile time! (not expected but all is fine)");
+        PRINT_DEBUG_LN("[RTC] RTC is the same as compile time! (not expected but all is fine)");
     }
 
     // never assume the Rtc was last configured by you, so

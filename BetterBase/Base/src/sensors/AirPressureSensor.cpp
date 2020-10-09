@@ -4,13 +4,14 @@
 
 void AirPressureSensor::init()
 {
+    PRINT_DEBUG_LN("[AIR PRESSURE] Initializing...");
     if (!bmp.begin(0x76, 0x58))
     {
-        PRINT_DEBUG_LN("Could not find a valid BMP280 sensor!");
+        PRINT_DEBUG_LN("[AIR PRESSURE] Could not find a valid BMP280 sensor!");
     }
     else
     {
-        PRINT_DEBUG_LN("Found a valid BMP280");
+        PRINT_DEBUG_LN("[AIR PRESSURE] Found a valid BMP280");
     }
 
     // Default settings from datasheet.

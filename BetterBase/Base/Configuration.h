@@ -9,7 +9,7 @@
 
 //If you have no radio included, please comment out the line below!
 
-#define RADIO_SUPPORT
+//#define RADIO_SUPPORT
 
 #if ENABLED(RADIO_SUPPORT)
     #define RADIO_SENDER_ADDRESS 0x4209696
@@ -32,6 +32,8 @@
 
 #define DEBUG_FEATURE
 
+//#define LOW_POWER_FUNCTION_SUPPORTED
+
 
 ///////////
 //SENSORS//
@@ -39,10 +41,10 @@
 
 #define AIR_PRESSURE_SENSOR_INSTALLED
 
-#define DHT_SENSOR_INSTALLED
+//#define DHT_SENSOR_INSTALLED
 
-// #define GAS_SENSOR_INSTALLED
+#define GAS_SENSOR_INSTALLED
 
-//#define PARTICLE_SENSOR_INSTALLED
+#define PARTICLE_SENSOR_INSTALLED
 
-#define WIND_SPEED_SENSOR_INSTALLED
+//#define WIND_SPEED_SENSOR_INSTALLED

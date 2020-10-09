@@ -13,6 +13,7 @@ void WindSpeedSensor::interruptHandler(void)
 
 WindSpeedSensor::WindSpeedSensor(int pin, bool useInterrupts)
 {
+    PRINT_DEBUG_LN("[WIND SPEED] Initializing...");
     noInterrupts();
     _pin = pin;
     interruptCapable = useInterrupts;

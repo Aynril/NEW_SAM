@@ -17,6 +17,7 @@
 #endif
 #if ENABLED(PARTICLE_SENSOR_INSTALLED)
 #include "PMSensor.h"
+#include <SoftwareSerial.h>
 #endif
 
 #if ENABLED(RADIO_SUPPORT)
@@ -38,167 +39,199 @@
 class SensorManager
 {
 private:
-#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     AirPressureSensor pressureSensor;
-#endif
+    #endif
     RainSensor rainSensor;
     EarthHumiditySensor earhtHumiditySensor;
     LightSensor lightSensor;
-#if ENABLED(DHT_SENSOR_INSTALLED)
+    #if ENABLED(DHT_SENSOR_INSTALLED)
     DHTSensor dhtSensor;
-#endif
-#if ENABLED(GAS_SENSOR_INSTALLED)
+    #endif
+    #if ENABLED(GAS_SENSOR_INSTALLED)
     MQ2Sensor mq2Sensor;
-#endif
-#if ENABLED(PARTICLE_SENSOR_INSTALLED)
-    SDS011 partilceSensor;
-#endif
-#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
-    WindSpeedSensor *windSpeedSensor = new WindSpeedSensor(PINOUT_WIND_SPEED_SENSOR_INTERRUPT, true);
-#endif
+    #endif
+    #if ENABLED(PARTICLE_SENSOR_INSTALLED)
+    SoftwareSerial particleSerial = SoftwareSerial(PINOUT_NOVA_PM_SENSOR_RX, PINOUT_NOVA_PM_SENSOR_TX);
+    SDS011 partilceSensor = SDS011(particleSerial);
+    #endif
+    #if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    WindSpeedSensor windSpeedSensor = WindSpeedSensor(PINOUT_WIND_SPEED_SENSOR_INTERRUPT, true);
+    #endif
 
-#if ENABLED(GAS_SENSOR_INSTALLED)
+    #if ENABLED(GAS_SENSOR_INSTALLED)
     uint16_t propane;
     uint16_t methane;
     uint16_t smoke;
     uint16_t hydrogen;
-#endif
+    #endif
 
     uint8_t rain;
     uint8_t earthHumidity;
     uint8_t light;
 
-#if ENABLED(DHT_SENSOR_INSTALLED)
+    #if ENABLED(DHT_SENSOR_INSTALLED)
     float airHumidity;
-#endif
+    #endif
 
-#if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
+    #if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
     float temp;
-#endif
+    #endif
 
-#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     float pressure;
     float height;
-#endif
+    #endif
 
-#if ENABLED(PARTICLE_SENSOR_INSTALLED)
-    uint8_t p25;
-    uint8_t p10;
-#endif
+    #if ENABLED(PARTICLE_SENSOR_INSTALLED)
+    float p25;
+    float p10;
+    #endif
 
-#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    #if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
     float speed;
-#endif
+    #endif
 
 public:
     void initAll();
     void saveAll();
+    void sensorsOn();
+    void sensorsOff();
 };
 
 void SensorManager::initAll()
 {
-#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
-    // windSpeedSensor.init(PINOUT_WIND_SPEED_SENSOR_INTERRUPT, true);
-#endif
+    PRINT_DEBUG_LN("[SENSOR MANAGER] Initializing...");
+    #if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+        //windSpeedSensor.init(PINOUT_WIND_SPEED_SENSOR_INTERRUPT, true);
+    #endif
 
-#if ENABLED(RTC_SUPPORT)
+    #if ENABLED(RTC_SUPPORT)
     initRTC();
-#endif
+    #endif
 
-#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    PRINT_DEBUG_LN("Initializing Pressure Sensor");
     pressureSensor.init();
-#endif
+    #endif
 
-#if ENABLED(DHT_SENSOR_INSTALLED)
+    #if ENABLED(DHT_SENSOR_INSTALLED)
+    PRINT_DEBUG_LN("Initializing DHT Sensor");
     dhtSensor.init();
-#endif
+    #endif
+
+    #if ENABLED(PARTICLE_SENSOR_INSTALLED)
+    PRINT_DEBUG_LN("Initializing PM Sensor & Serial");
+    //SoftwareSerial particleSerial2(PINOUT_NOVA_PM_SENSOR_RX, PINOUT_NOVA_PM_SENSOR_TX);
+    particleSerial.begin(9600);
+    //particleSerial->begin(9600);
+    // partilceSensor.init();
+    delay(1000);
+    partilceSensor.wakeup();
+    delay(1000);
+    partilceSensor.autoMode();
+    #endif
+}
+
+void SensorManager::sensorsOn() {
+    partilceSensor.wakeup();
+    delay(5000);
+}
+
+void SensorManager::sensorsOff() {
+    partilceSensor.sleep();
+    delay(2000);
 }
 
 void SensorManager::saveAll()
 {
-#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    PRINT_DEBUG_LN("Reading Pressure Sensor");
     pressure = pressureSensor.getPressure();
     height = pressureSensor.getAltitute();
-#endif
-#if ENABLED(DHT_SENSOR_INSTALLED)
+    #endif
+    #if ENABLED(DHT_SENSOR_INSTALLED)
+    PRINT_DEBUG_LN("Reading DHT Sensor");
     airHumidity = dhtSensor.getHumidity();
-#endif
+    #endif
 
-#if ENABLED(GAS_SENSOR_INSTALLED)
+    #if ENABLED(GAS_SENSOR_INSTALLED)
+    PRINT_DEBUG_LN("Reading MQ2 Sensor");
     propane = (mq2Sensor.getPropane());
     methane = (mq2Sensor.getMethane());
     smoke = (mq2Sensor.getSmoke());
     hydrogen = (mq2Sensor.getHydrogen());
-#endif
+    #endif
 
+    PRINT_DEBUG_LN("Reading Analog Sensors");
     rain = (rainSensor.read());
     earthHumidity = (earhtHumiditySensor.read());
     light = (lightSensor.read());
 
-#if BOTH(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
+    #if BOTH(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
     temp = ((pressureSensor.getTemperature() + dhtSensor.getTemperature()) / 2);
-#elif ENABLED(DHT_SENSOR_INSTALLED)
+    #elif ENABLED(DHT_SENSOR_INSTALLED)
     temp = dhtSensor.getTemperature();
-#elif ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    #elif ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     temp = pressureSensor.getTemperature();
-#endif
+    #endif
 
-#if ENABLED(PARTICLE_SENSOR_INSTALLED)
-    p10 = partilceSensor.get10();
-    p25 = partilceSensor.get25();
-#endif
+    #if ENABLED(PARTICLE_SENSOR_INSTALLED)
+    PRINT_DEBUG_LN("Reading PM Sensor");
+    partilceSensor.read(&p25, &p10);
+    #endif
 
-#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
-    speed = windSpeedSensor->getSpeed(SPEED_KMH);
-#endif
+    #if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    speed = windSpeedSensor.getSpeed(SPEED_KMH);
+    #endif
 
-#if ENABLED(RADIO_SUPPORT)
+    #if ENABLED(RADIO_SUPPORT)
 
-#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     setAirPressure(pressure);
-#endif
-#if ENABLED(DHT_SENSOR_INSTALLED)
+    #endif
+    #if ENABLED(DHT_SENSOR_INSTALLED)
     setAirHumidity(airHumidity);
-#endif
+    #endif
 
-#if ENABLED(GAS_SENSOR_INSTALLED)
+    #if ENABLED(GAS_SENSOR_INSTALLED)
     setPropane(propane);
     setMethane(methane);
     setSmoke(smoke);
     setHydrogen(hydrogen);
-#endif
+    #endif
 
     setRain(rain);
     setEarhtHumidity(earthHumidity);
     setLightIntensity(light);
 
-#if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
+    #if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
     setTemperature(temp);
-#endif
+    #endif
 
-#if ENABLED(PARTICLE_SENSOR_INSTALLED)
+    #if ENABLED(PARTICLE_SENSOR_INSTALLED)
     setParticles(p10, p25);
-#endif
+    #endif
 
-#endif
+    #endif
 
-#if ENABLED(SERIAL_OUTPUT_SUPPORT)
-#if ENABLED(RTC_SUPPORT)
+    #if ENABLED(SERIAL_OUTPUT_SUPPORT)
+    #if ENABLED(RTC_SUPPORT)
     Serial.print(getTimeNow());
     Serial.print(F(","));
-#endif
-#if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
+    #endif
+    #if ENABLED(AIR_PRESSURE_SENSOR_INSTALLED)
     Serial.print((double)pressure);
     Serial.print(F(","));
     Serial.print((double)height);
     Serial.print(F(","));
-#endif
-#if ENABLED(DHT_SENSOR_INSTALLED)
+    #endif
+    #if ENABLED(DHT_SENSOR_INSTALLED)
     Serial.print((double)airHumidity);
     Serial.print(F(","));
-#endif
+    #endif
 
-#if ENABLED(GAS_SENSOR_INSTALLED)
+    #if ENABLED(GAS_SENSOR_INSTALLED)
     Serial.print(propane);
     Serial.print(F(","));
     Serial.print(methane);
@@ -207,7 +240,7 @@ void SensorManager::saveAll()
     Serial.print(F(","));
     Serial.print(hydrogen);
     Serial.print(F(","));
-#endif
+    #endif
 
     // Serial.print(rain);
     // Serial.print(F(","));
@@ -216,19 +249,19 @@ void SensorManager::saveAll()
     // Serial.print(light);
     // Serial.print(F(","));
 
-#if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
+    #if ANY(AIR_PRESSURE_SENSOR_INSTALLED, DHT_SENSOR_INSTALLED)
     Serial.print((double)temp);
     Serial.print(F(","));
-#endif
-#if ENABLED(PARTICLE_SENSOR_INSTALLED)
+    #endif
+    #if ENABLED(PARTICLE_SENSOR_INSTALLED)
     Serial.print(p10);
     Serial.print(F(","));
     Serial.println(p25);
     Serial.print(F(","));
-#endif
-#if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
+    #endif
+    #if ENABLED(WIND_SPEED_SENSOR_INSTALLED)
     Serial.println(speed);
-#endif
+    #endif
 
-#endif
+    #endif
 }

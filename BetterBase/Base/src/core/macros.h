@@ -49,6 +49,7 @@
 #define IS_POWER_OF_2(x) ((x) && !((x) & ((x)-1)))
 
 // Macros to chain up to 12 conditions
+#define _DO_0(W, C, A) (_##W##_1(A))
 #define _DO_1(W, C, A) (_##W##_1(A))
 #define _DO_2(W, C, A, B) (_##W##_1(A) C _##W##_1(B))
 #define _DO_3(W, C, A, V...) (_##W##_1(A) C _DO_2(W, C, V))

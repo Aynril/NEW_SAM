@@ -5,20 +5,23 @@
 
 uint8_t SDS011::readParticleByPin(int pin)
 {
-    if (serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized serial mode!");
-        return 0;
-    }
-    PRINT_DEBUG_LN("Pin is" + String(pin));
-    return pulseIn(pin, HIGH, 1500000) / 1000 - 2;
+	if (serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized serial mode!");
+		return 0;
+	}
+	PRINT_DEBUG_LN("Pin is" + String(pin));
+	return pulseIn(pin, HIGH, 1500000) / 1000 - 2;
 }
 
-uint8_t SDS011::get10() {
-    return readParticleByPin(PINOUT_NOVA_PM_SENSOR_PWM_10);
+uint8_t SDS011::get10()
+{
+	return readParticleByPin(pwmPin10);
 }
 
-uint8_t SDS011::get25() {
-    return readParticleByPin(PINOUT_NOVA_PM_SENSOR_PWM_25);
+uint8_t SDS011::get25()
+{
+	return readParticleByPin(pwmPin25);
 }
 
 #define SLEEPCMD SDS011::constructCMD(0x06, 0x01, 0x00)
@@ -28,6 +31,8 @@ uint8_t SDS011::get25() {
 #define QUERY_MODE SDS011::constructCMD(0x02, 0x00, 0x00)
 
 #define REPORTING_MODE SDS011::constructCMD(0x02, 0x01, 0x00)
+
+#define SET_QUERY_MODE SDS011::constructCMD(0x02, 0x01, 0x01)
 
 const byte *SDS011::constructCMD(
 	byte command,
@@ -74,26 +79,28 @@ const byte *SDS011::constructCMD(byte command, byte data2, byte data3, int devic
 
 void SDS011::sendCMD(const byte *cmd)
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
-	DEBUG_PRINT("Sending:\t\t");
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return;
+	}
+	PRINT_DEBUG("Sending:\t\t");
 	for (byte i = 0; i < 19; i++)
 	{
 		sds_data.write(cmd[i]);
-		DEBUG_PRINT_HEX(cmd[i]);
-		DEBUG_PRINT(" ");
+		PRINT_DEBUG_HEX(cmd[i]);
+		PRINT_DEBUG(" ");
 	}
 }
 
 void SDS011::waitAndAnswer()
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
-	DEBUG_PRINTLN("\nSDS Answers:");
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return;
+	}
+	PRINT_DEBUG_LN("\nSDS Answers:");
 	sds_data.flush();
 	while (sds_data.available() <= 0)
 	{
@@ -101,18 +108,19 @@ void SDS011::waitAndAnswer()
 	}
 	while (sds_data.available() > 0)
 	{
-		DEBUG_PRINT_HEX(sds_data.read());
-		DEBUG_PRINT(" ");
+		PRINT_DEBUG_HEX(sds_data.read());
+		PRINT_DEBUG(" ");
 	}
-	DEBUG_PRINTLN();
+	PRINT_DEBUG_LN();
 }
 
 int SDS011::process(int db1)
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return -1;
+	}
 	byte buffer;
 	int value;
 	int len = 0;
@@ -125,7 +133,7 @@ int SDS011::process(int db1)
 	int checksum_ok = 0;
 	int error = 1;
 	int checksum_should = 0;
-	DEBUG_PRINT("\nSDS Answers:\t\t");
+	PRINT_DEBUG("\nSDS Answers:\t\t");
 	sds_data.flush();
 	long now = millis();
 	while (sds_data.available() < 10)
@@ -133,10 +141,10 @@ int SDS011::process(int db1)
 		yield();
 		if (millis() - now > 500)
 		{
-			Serial.println("Fucked up");
+			Serial.print("Fucked up! It had ");
+			Serial.println(sds_data.available());
 			return 0;
 		}
-		
 	}
 	while ((sds_data.available() > 0) && (sds_data.available() >= (10 - len)))
 	{
@@ -150,21 +158,21 @@ int SDS011::process(int db1)
 				//checksum_is += 0xF1;
 				//checksum_ok = 0;
 				len = -1;
-				DEBUG_PRINT("X");
+				PRINT_DEBUG("X");
 			};
 			break;
 		case (1): // COMMAND ID
 			if (value != 0xC5)
 			{
 				len = -1;
-				DEBUG_PRINT("XX");
+				PRINT_DEBUG("XX");
 			};
 			break;
 		case (2): // COMMAND
 			if (value != db1)
 			{
 				len = -1;
-				DEBUG_PRINT("XXX");
+				PRINT_DEBUG("XXX");
 			}
 			else
 			{
@@ -209,8 +217,8 @@ int SDS011::process(int db1)
 			};
 			break;
 		}
-		DEBUG_PRINT_HEX(value);
-		DEBUG_PRINT(" ");
+		PRINT_DEBUG_HEX(value);
+		PRINT_DEBUG(" ");
 		len++;
 
 		if (len == 10 && (checksum_ok == 1 || checksum_is == checksum_should))
@@ -228,65 +236,107 @@ int SDS011::process(int db1)
 		}
 		yield();
 	}
-	DEBUG_PRINTLN("\n--------------------------");
-	DEBUG_PRINT("Response was ");
+	PRINT_DEBUG_LN("\n----DEBUG-FOR-COMM----");
+	PRINT_DEBUG("Response was ");
 	if (error > 0)
 	{
-		DEBUG_PRINTLN("faulty");
-		DEBUG_PRINT("Checksum Expected:\t");
-		DEBUG_PRINTLN_HEX((checksum_is & 0xFF));
-		DEBUG_PRINT("Checksum Is:\t\t");
-		DEBUG_PRINTLN_HEX((checksum_should & 0xFF));
+		PRINT_DEBUG_LN("faulty");
+		PRINT_DEBUG("Checksum Expected:\t");
+		PRINT_DEBUG_HEX((checksum_is & 0xFF));
+		PRINT_DEBUG_LN();
+		PRINT_DEBUG("Checksum Is:\t\t");
+		PRINT_DEBUG_HEX((checksum_should & 0xFF));
+		PRINT_DEBUG_LN();
 	}
 	else
 	{
-		DEBUG_PRINTLN("ok");
+		PRINT_DEBUG_LN("ok");
 	}
 
-	DEBUG_PRINT("Data: ");
-	DEBUG_PRINT_HEX(data2);
-	DEBUG_PRINT(" ");
-	DEBUG_PRINT_HEX(data3);
-	DEBUG_PRINT(" ");
-	DEBUG_PRINTLN_HEX(data4);
+	PRINT_DEBUG("Data: ");
+	PRINT_DEBUG_HEX(data2);
+	PRINT_DEBUG(" ");
+	PRINT_DEBUG_HEX(data3);
+	PRINT_DEBUG(" ");
+	PRINT_DEBUG_HEX(data4);
+	PRINT_DEBUG_LN();
 
-	DEBUG_PRINT("Device ID is ");
-	DEBUG_PRINT_HEX(deviceHigh);
-	DEBUG_PRINTLN_HEX(deviceLow);
-	DEBUG_PRINTLN("--------------------------");
+	PRINT_DEBUG("Device ID is ");
+	PRINT_DEBUG_HEX(deviceHigh);
+	PRINT_DEBUG_HEX(deviceLow);
+	PRINT_DEBUG_LN("\n-----END-OF-DEBUG-----\n");
 	return error;
 }
 
 void SDS011::printMode()
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
-	DEBUG_PRINTLN("QUERY MODE");
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return;
+	}
+	PRINT_DEBUG_LN("QUERY MODE");
 	sendCMD(QUERY_MODE);
 	process(QUERY_MODE[2]);
 }
 
 void SDS011::autoMode()
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
-	DEBUG_PRINTLN("SET AUTO MODE");
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return;
+	}
+	PRINT_DEBUG_LN("SET AUTO MODE");
 	sendCMD(REPORTING_MODE);
-	process(REPORTING_MODE[2]);
+	while (process(REPORTING_MODE[2]))
+	{
+		delay(50);
+		sendCMD(REPORTING_MODE);
+	}
 }
+
+void SDS011::queryMode()
+{
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return;
+	}
+	PRINT_DEBUG_LN("SET QUERY MODE");
+	sendCMD(SET_QUERY_MODE);
+	while (process(SET_QUERY_MODE[2]))
+	{
+		delay(50);
+		sendCMD(SET_QUERY_MODE);
+	}
+}
+
 // --------------------------------------------------------
 // SDS011:read
 // --------------------------------------------------------
 int SDS011::read(float *p25, float *p10)
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
+	if (serialMode)
+	{
+		PRINT_DEBUG_LN("SDS reading in Serial Mode");
+		readSerial(p25, p10);
+	}
+	else
+	{
+		*p25 = get25();
+		*p10 = get10();
+	}
+	return 0;
+}
+
+int SDS011::readSerial(float *p25, float *p10)
+{
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return -1;
+	}
 	byte buffer;
 	int value;
 	int len = 0;
@@ -298,8 +348,8 @@ int SDS011::read(float *p25, float *p10)
 	while ((sds_data.available() > 0) && (sds_data.available() >= (10 - len)))
 	{
 		buffer = sds_data.read();
-		DEBUG_PRINT_HEX(buffer);
-		DEBUG_PRINT(" ");
+		PRINT_DEBUG_HEX(buffer);
+		PRINT_DEBUG(" ");
 		value = int(buffer);
 		switch (len)
 		{
@@ -365,7 +415,7 @@ int SDS011::read(float *p25, float *p10)
 			pm25_serial = 0.0;
 			checksum_is = 0;
 			error = 0;
-			DEBUG_PRINTLN("");
+			PRINT_DEBUG_LN("");
 		}
 		yield();
 	}
@@ -377,17 +427,19 @@ int SDS011::read(float *p25, float *p10)
 // --------------------------------------------------------
 void SDS011::sleep()
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
-	DEBUG_PRINTLN("SET SLEEP");
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return;
+	}
+	PRINT_DEBUG_LN("SET SLEEP");
 	sendCMD(SLEEPCMD);
 	sds_data.flush();
 	while (sds_data.available())
 	{
 		sds_data.read();
 	}
+	PRINT_DEBUG_LN("\n");
 }
 
 // --------------------------------------------------------
@@ -395,11 +447,12 @@ void SDS011::sleep()
 // --------------------------------------------------------
 void SDS011::wakeup()
 {
-    if (!serialMode) {
-        PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
-        return;
-    }
-	DEBUG_PRINTLN("WAKE UP");
+	if (!serialMode)
+	{
+		PRINT_DEBUG_LN("SDS011: Wrong method used! You initialized PWM mode!");
+		return;
+	}
+	PRINT_DEBUG_LN("WAKE UP");
 	sendCMD(WAKECMD);
 	while (process(WAKECMD[2]))
 	{
