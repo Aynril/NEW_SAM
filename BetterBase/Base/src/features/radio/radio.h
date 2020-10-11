@@ -19,9 +19,12 @@ struct RadioPacket
   float temp;
 
   float pressure;
+  float altitude;
 
   uint8_t p25;
   uint8_t p10;
+
+  float windSpeed;
 };
 
 void initRadio();
@@ -50,4 +53,9 @@ void setTemperature(int8_t temperature);
 
 void setAirPressure(float pressure);
 
+void setAltitude(float altitude);
+
+
 void setParticles(uint8_t p10, uint8_t p25);
+
+void setWindSpeed(float speed);

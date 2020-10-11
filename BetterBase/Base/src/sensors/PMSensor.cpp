@@ -124,11 +124,13 @@ int SDS011::process(int db1)
 	byte buffer;
 	int value;
 	int len = 0;
+#if ENABLED(DEBUG_FEATURE)
 	int data2 = 0;
 	int data3 = 0;
 	int data4 = 0;
 	int deviceHigh = 0;
 	int deviceLow = 0;
+	#endif
 	int checksum_is = 0;
 	int checksum_ok = 0;
 	int error = 1;
@@ -141,8 +143,9 @@ int SDS011::process(int db1)
 		yield();
 		if (millis() - now > 500)
 		{
-			Serial.print("Fucked up! It had ");
-			Serial.println(sds_data.available());
+			PRINT_DEBUG("Fucked up! It had ");
+			PRINT_DEBUG_DEC(sds_data.available());
+			PRINT_DEBUG_LN();
 			return 0;
 		}
 	}
@@ -180,23 +183,33 @@ int SDS011::process(int db1)
 			}
 			break;
 		case (3): // DATA 2
+#if ENABLED(DEBUG_FEATURE)
 			data2 = value;
+#endif
 			checksum_is += value;
 			break;
 		case (4): // DATA 3
+#if ENABLED(DEBUG_FEATURE)
 			data3 = value;
+#endif
 			checksum_is += value;
 			break;
 		case (5): // DATA 4
+#if ENABLED(DEBUG_FEATURE)
 			data4 = value;
+#endif
 			checksum_is += value;
 			break;
 		case (6): // DEVICE ID
+#if ENABLED(DEBUG_FEATURE)
 			deviceHigh = value;
+#endif
 			checksum_is += value;
 			break;
 		case (7): // DEVICE ID
+#if ENABLED(DEBUG_FEATURE)
 			deviceLow = value;
+#endif
 			checksum_is += value;
 			break;
 		case (8):

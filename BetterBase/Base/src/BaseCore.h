@@ -12,6 +12,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if ENABLED(LOW_POWER_FUNCTION_SUPPORTED)
+#if ENABLED(LOW_POWER_MODE)
 #include "features/LowPower.h"
 #endif
+
+#if ENABLED(SD_SUPPORT)
+#include "features/sd/SDHelper.h"
+#endif
+
+#if ENABLED(RADIO_SUPPORT)
+#include "features/radio/radio.h"
+#endif
+
+//#include <LowPower.h>

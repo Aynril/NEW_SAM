@@ -34,9 +34,12 @@ struct RadioPacket
   float temp;
 
   float pressure;
+  float altitude;
 
   uint8_t p25;
   uint8_t p10;
+
+  float windSpeed;
 };
 RadioPacket radioData;
 void saveRadio()

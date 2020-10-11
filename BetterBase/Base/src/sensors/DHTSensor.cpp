@@ -4,19 +4,14 @@
 #include "DHTSensor.h"
 #include "../core/serial.h"
 
-DHTSensor::DHTSensor()
-{
-    dht = new DHT(PINOUT_DHT22_INPUT, DHT11);
-}
-
 void DHTSensor::init()
 {
-    dht->begin();
+    dht.setup(PINOUT_DHT22_INPUT);
 }
 
 float DHTSensor::getHumidity()
 {
-    float ret = dht->readHumidity();
+    float ret = dht.getHumidity();
     PRINT_DEBUG("DHT Humidity: ");
     PRINT_DEBUG_LN(ret);
     return ret;
@@ -24,7 +19,7 @@ float DHTSensor::getHumidity()
 
 float DHTSensor::getTemperature()
 {
-    float ret = dht->readTemperature();
+    float ret = dht.getTemperature();
     PRINT_DEBUG("DHT Temperature: ");
     PRINT_DEBUG_LN(ret);
     return ret;

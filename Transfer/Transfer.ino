@@ -22,17 +22,23 @@ RF24 radio(7,8);                        // Set up nRF24L01 radio on SPI bus plus
 
 /***************************************************************/
 const uint64_t address = 0x4209696;
+
 struct RadioPacket
 {
-  uint8_t lpg;
-  uint8_t methane;
-  uint8_t smoke;
+  uint16_t propane;
+  uint16_t methane;
+  uint16_t smoke;
+  uint16_t hydrogen;
+
   uint8_t rain;
   uint8_t earthHumidity;
   uint8_t light;
-  uint8_t airHumidity;
-  int8_t temp;
+
+  float airHumidity;
+  float temp;
+
   float pressure;
+
   uint8_t p25;
   uint8_t p10;
 };
@@ -47,6 +53,8 @@ void setup(void) {
     
     Serial.println("Radio OK");
     
+    } else {
+      Serial.println("Radio fail");
     }
   radio.setPALevel(RF24_PA_MAX);
   radio.setDataRate(RF24_1MBPS); //test RF24_250KBPS later maybe, but i dunno (only works with + variants), this method return a boolean that indicates the success of the setFunktion
@@ -55,7 +63,7 @@ void setup(void) {
   
   radio.powerUp();
   
-  radioData.lpg = 123;
+  radioData.propane = 123;
   radioData.methane = 2;
   radioData.rain = 3;
   radioData.earthHumidity = 1;
@@ -70,7 +78,7 @@ void setup(void) {
 void loop(void){
   radio.stopListening();
   radio.openWritingPipe(address);
-  radio.write(&radioData, sizeof(radioData));
+  Serial.println(radio.write(&radioData, sizeof(radioData)));
   Serial.println("Send");
 
   delay(500);

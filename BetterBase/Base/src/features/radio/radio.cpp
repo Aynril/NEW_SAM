@@ -4,7 +4,7 @@
 
 #include "radio.h"
 
-RF24 radio(PINOUT_RADIO_CE, PINOUT_RADIO_CSN);
+RF24 radio(PINOUT_RADIO_CE, PINOUT_RADIO_CSN, 250000);
 
 RadioPacket radioData;
 
@@ -14,8 +14,24 @@ RadioPacket radioData;
 
 void initRadio()
 {
-  if(!radio.begin()) {
-    PRINT_DEBUG_LN("ERROR: Radio was not initalized");
+  if (!radio.begin())
+  {
+    Serial.println("ERROR: Radio was not initalized");
+    delay(500);
+    for (uint8_t i = 0; i < 5; i++)
+    {
+      if (radio.begin())
+      {
+        PRINT_DEBUG_LN("Success Radio");
+        break;
+      }
+      delay(500);
+    }
+    PRINT_DEBUG_LN("Ultimate Fail!");
+  }
+  else
+  {
+    PRINT_DEBUG_LN("Success Radio");
   }
   radio.setPALevel(RADIO_POWER_LEVEL);
   radio.setDataRate(RF24_1MBPS);
@@ -44,9 +60,9 @@ void initRadio()
 void radioWriteMode()
 {
   radio.stopListening();
-  PRINT_DEBUG("Open writing Pipe at adress ");
-  PRINT_DEBUG_HEX(RADIO_SENDER_ADDRESS);
-  PRINT_DEBUG_LN("");
+  Serial.print("Open writing Pipe at adress ");
+  Serial.print(RADIO_SENDER_ADDRESS, HEX);
+  Serial.println("");
   radio.openWritingPipe(RADIO_SENDER_ADDRESS);
 }
 
@@ -58,7 +74,20 @@ void sendMessage()
 #endif
 
   radioWriteMode();
-  PRINT_DEBUG_LN(radio.write(&radioData, sizeof(radioData)));
+  for (uint8_t i = 0; i < 5; i++)
+  {
+    
+    bool writeOK = radio.write(&radioData, sizeof(radioData));
+    if (writeOK) {
+      Serial.println("Send OK");
+      break;
+    }
+    else
+    {
+      Serial.println("Fail");
+    }
+    
+  }
 
 #if ENABLED(RADIO_LOW_POWER_MODE)
   delay(15);
@@ -116,10 +145,18 @@ void setAirPressure(float pressure)
   radioData.pressure = pressure;
 }
 
+void setAltitude(float altitude) {
+  radioData.altitude = altitude;
+}
+
 void setParticles(uint8_t p10, uint8_t p25)
 {
   radioData.p10 = p10;
   radioData.p25 = p25;
+}
+
+void setWindSpeed(float speed) {
+  radioData.windSpeed = speed;
 }
 
 #endif //RADIO_SUPPORT

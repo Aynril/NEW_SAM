@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.7.1"};
+const String FirmwareVer = {"1.8.0"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -314,7 +314,7 @@ void wifiFinishSite()
   lcd.clear();
   printTip("Connected to WiFi", 0);
   printTip("SSID:" + WiFi.SSID(), 1);
-  printTip("IP:" + WiFi.localIP(), 2);
+  printTip("IP:" + WiFi.localIP().toString(), 2);
   printTip("RSSI:" + WiFi.RSSI(), 3);
   delay(3000);
 #endif
