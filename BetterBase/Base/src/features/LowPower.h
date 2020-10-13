@@ -140,19 +140,19 @@ void LowPower::shutdownFuntions()
     clockSource = TCCR2B;
 
     // Remove the clock source to shutdown Timer2
-    TCCR2B &= ~(1 << CS22);
-    TCCR2B &= ~(1 << CS21);
-    TCCR2B &= ~(1 << CS20);
+    // TCCR2B &= ~(1 << CS22);
+    // TCCR2B &= ~(1 << CS21);
+    // TCCR2B &= ~(1 << CS20);
 
-    power_timer2_disable();
+    // power_timer2_disable();
 
-    ADCSRA &= ~(1 << ADEN);
-    power_adc_disable();
+    // ADCSRA &= ~(1 << ADEN);
+    // power_adc_disable();
 
-    power_timer1_disable();
-    power_spi_disable();
-    power_usart0_disable();
-    power_twi_disable();
+    //power_timer1_disable();
+    //power_spi_disable();
+    //power_usart0_disable();
+    // power_twi_disable();
     if (_mosfetType != NO_MOSFET) {
         disable5V();
     }
@@ -160,17 +160,17 @@ void LowPower::shutdownFuntions()
 
 void LowPower::powerupFunctions()
 {
-    power_adc_enable();
-    ADCSRA |= (1 << ADEN);
+    // power_adc_enable();
+    // ADCSRA |= (1 << ADEN);
 
     // Restore previous setting
-    TCCR2B = clockSource;
-    power_timer2_enable();
+    //TCCR2B = clockSource;
+    //power_timer2_enable();
 
-    power_timer1_enable();
-    power_spi_enable();
-    power_usart0_enable();
-    power_twi_enable();
+    //power_timer1_enable();
+    //power_spi_enable();
+    //power_usart0_enable();
+    // power_twi_enable();
     if (_mosfetType != NO_MOSFET) {
         enable5V();
     }

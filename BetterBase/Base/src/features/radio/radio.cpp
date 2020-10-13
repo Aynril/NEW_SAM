@@ -14,6 +14,7 @@ RadioPacket radioData;
 
 void initRadio()
 {
+  bool initOK = false;
   if (!radio.begin())
   {
     Serial.println("ERROR: Radio was not initalized");
@@ -23,11 +24,16 @@ void initRadio()
       if (radio.begin())
       {
         PRINT_DEBUG_LN("Success Radio");
+        initOK = true;
         break;
       }
       delay(500);
     }
-    PRINT_DEBUG_LN("Ultimate Fail!");
+    if (!initOK)
+    {
+      PRINT_DEBUG_LN("Ultimate Fail!");
+      RESET();
+    }
   }
   else
   {
@@ -74,20 +80,20 @@ void sendMessage()
 #endif
 
   radioWriteMode();
-  for (uint8_t i = 0; i < 5; i++)
+  bool writeOK = radio.writeFast(&radioData, sizeof(radioData));
+  bool waitOK = radio.txStandBy();
+  if (waitOK)
   {
-    
-    bool writeOK = radio.write(&radioData, sizeof(radioData));
-    if (writeOK) {
-      Serial.println("Send OK");
-      break;
-    }
-    else
-    {
-      Serial.println("Fail");
-    }
-    
+    Serial.println("Wait OK");
   }
+  if (writeOK) {
+    Serial.println("Write OK");
+  }
+  if (!writeOK && !waitOK) {
+    Serial.println("Fail");
+  }
+
+  radio.startListening();
 
 #if ENABLED(RADIO_LOW_POWER_MODE)
   delay(15);
@@ -145,7 +151,8 @@ void setAirPressure(float pressure)
   radioData.pressure = pressure;
 }
 
-void setAltitude(float altitude) {
+void setAltitude(float altitude)
+{
   radioData.altitude = altitude;
 }
 
@@ -155,7 +162,8 @@ void setParticles(uint8_t p10, uint8_t p25)
   radioData.p25 = p25;
 }
 
-void setWindSpeed(float speed) {
+void setWindSpeed(float speed)
+{
   radioData.windSpeed = speed;
 }
 

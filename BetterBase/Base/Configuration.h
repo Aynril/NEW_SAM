@@ -1,6 +1,6 @@
 #pragma once
 
-//#define DEBUG_DEVELOPMENT_MODE
+#define DEBUG_DEVELOPMENT_MODE
 
 //If you have no SD card included, please comment out the line below!
 
@@ -36,7 +36,7 @@
 #endif
 
 #if BOTH(RADIO_SUPPORT, LOW_POWER_MODE)
-    #define RADIO_LOW_POWER_MODE
+// #define RADIO_LOW_POWER_MODE
 #endif
 
 ///////////

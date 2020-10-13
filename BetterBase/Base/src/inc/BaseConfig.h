@@ -10,3 +10,5 @@
 #include "SanityCheck.h"
 
 #include "../core/serial.h"
+
+#define RESET() digitalWrite(PINOUT_HARDWARE_RESET_PIN, LOW)
