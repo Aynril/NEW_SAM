@@ -5,7 +5,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 unsigned short site = 0;
 
-char *currentTip = (char*) String("Loading..").c_str();
+char *currentTip = (char *)String("Loading..").c_str();
 int currentTipIndex = 0;
 int currentLineIndex = 0;
 volatile bool youMayContinue = true;
@@ -44,14 +44,19 @@ void printTip(String sin, int lineIndex)
     lcd.print(s);
     youMayContinue = true;
     return;
-  } else
+  }
+  else
   {
-    lcd.autoscroll();
+    //lcd.autoscroll();
     lcd.setCursor(0, lineIndex);
-    lcd.print(s);
+    String toPrint = "";
+    for (int c = 0; c < 20; c++)
+    {
+      toPrint += currentTip[currentTipIndex + c];
+    }
+    lcd.print(toPrint.c_str());
     youMayContinue = false;
   }
-  
 }
 
 void shiftIfNeeded()
@@ -68,7 +73,7 @@ void shiftIfNeeded()
     lcd.print(currentTip);
     return;
   }
-  
+
   if (currentTipIndex >= (int)strlen(currentTip) - 19)
   {
     youMayContinue = true;
