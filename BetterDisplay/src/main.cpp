@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.8.2"};
+const String FirmwareVer = {"1.8.3"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -362,14 +362,14 @@ void site1()
   printSensorName(F("Temperature"));
   printValue("", temperature, F(" C"), 1);
   printValue("", temperature * 5 / 9 + 32, F(" F"), 2);
-  printTip(tempTip().c_str(), 3);
+  printTip("Good temperature", 3);
 }
 void site2()
 { //Humidity
   lcd.clear();
   printSensorName(F("Humidity"));
   printValue("", airHumidity, F("%"), 1);
-  printTip(humidityTip().c_str(), 3);
+  printTip("Good Humidity", 3);
 }
 void site3()
 { //Earth Hum
@@ -382,7 +382,7 @@ void site4()
   lcd.clear();
   printSensorName(F("Rain"));
   printValue("", map(rain, 0, 1023, 0, 100), F("%"), 1);
-  printTip(rainTip().c_str(), 2);
+  printTip("Water your plants", 2);
 }
 void site5()
 { //Pressure
@@ -415,32 +415,7 @@ void site9()
 { //wind
   lcd.clear();
   printSensorName(F("Wind"));
-  printValue(F("Speed: "), windspeed, F("m/s"), 2);
-  String printing = F("Direction: ");
-  Serial.println(winddirection);
-  switch (winddirection)
-  {
-  case 0:
-    printing += F("N");
-  case 1:
-    printing += F("NE");
-  case 2:
-    printing += F("E");
-  case 3:
-    printing += F("SE");
-  case 4:
-    printing += F("S");
-  case 5:
-    printing += F("SW");
-  case 6:
-    printing += F("W");
-  case 7:
-    printing += F("NW");
-  default:
-    printing += F("N/A");
-  }
-  lcd.setCursor(1, 3);
-  lcd.print(printing.c_str());
+  printValue(F("Speed: "), windspeed, F("km/h"), 2);
 }
 void siteFailure()
 {
