@@ -23,7 +23,7 @@ struct RadioPacket
 {
   uint16_t propane;
   uint16_t methane;
-  uint16_t smoke;
+  //uint16_t smoke;
   uint16_t hydrogen;
 
   uint8_t rain;
@@ -46,7 +46,7 @@ void saveRadio()
 {
   lpg = radioData.propane;
   methane = radioData.methane;
-  smoke = radioData.smoke;
+  smoke = 0;
   rain = radioData.rain;
   earthHumidity = radioData.earthHumidity;
   light = radioData.light;

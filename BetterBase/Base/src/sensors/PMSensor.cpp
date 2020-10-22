@@ -446,12 +446,13 @@ void SDS011::sleep()
 		return;
 	}
 	PRINT_DEBUG_LN("SET SLEEP");
-	sendCMD(SLEEPCMD);
-	sds_data.flush();
-	while (sds_data.available())
-	{
-		sds_data.read();
-	}
+	// sendCMD(SLEEPCMD);
+	//sds_data.flush();
+	// while (sds_data.available())
+	// {
+	// 	sds_data.read();
+	// 	yield();
+	// }
 	PRINT_DEBUG_LN("\n");
 }
 

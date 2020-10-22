@@ -43,18 +43,17 @@ void loop()
     delay(2000);
     manager.sensorsOn();
 #endif
-
     manager.saveAll();
-#if ENABLED(LOW_POWER_MODE)
-    manager.sensorsOff();
-#endif
+
 #if ENABLED(RADIO_SUPPORT)
     sendMessage();
 #endif
 #if ENABLED(LOW_POWER_MODE)
+    // manager.sensorsOff();
     //lp.shutdownFuntions();
     delay(5000);
 #endif
+    delay(5000);
 #if DISABLED(DEBUG_DEVELOPMENT_MODE)
     delay(30000);
 #else

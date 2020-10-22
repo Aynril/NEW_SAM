@@ -66,9 +66,9 @@ void initRadio()
 void radioWriteMode()
 {
   radio.stopListening();
-  Serial.print("Open writing Pipe at adress ");
-  Serial.print(RADIO_SENDER_ADDRESS, HEX);
-  Serial.println("");
+  PRINT_DEBUG("Open writing Pipe at adress ");
+  PRINT_DEBUG_HEX(RADIO_SENDER_ADDRESS);
+  PRINT_DEBUG_LN("");
   radio.openWritingPipe(RADIO_SENDER_ADDRESS);
 }
 
@@ -113,7 +113,7 @@ void setMethane(uint16_t methane)
 
 void setSmoke(uint16_t smoke)
 {
-  radioData.smoke = smoke;
+  //radioData.smoke = smoke;
 }
 
 void setHydrogen(uint16_t hydrogen)

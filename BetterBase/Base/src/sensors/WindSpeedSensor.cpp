@@ -44,6 +44,7 @@ void WindSpeedSensor::handle(Wind_Data_t *data)
 {
     noInterrupts();
     data->count++;
+    Serial.print("I");
     interrupts();
 }
 
@@ -56,7 +57,7 @@ float WindSpeedSensor::getSpeed(speed_output_type oType = SPEED_MPS)
     }
     else if (oType == SPEED_KMH)
     {
-        return speed / 3.6;
+        return speed * 3.6;
     }
     else if (oType == SPEED_MIPS)
     {
@@ -67,7 +68,7 @@ float WindSpeedSensor::getSpeed(speed_output_type oType = SPEED_MPS)
         return speed * 0.911344;
     }
 
-    //return speed;
+    return speed;
 }
 
 void WindSpeedSensor::readSpeed()
@@ -80,22 +81,7 @@ void WindSpeedSensor::readSpeed()
         PRINT_DEBUG(windData.count);
         PRINT_DEBUG(" Time: ");
         PRINT_DEBUG(deltaT);
-        // float ticksPerSecond = (float)windData.count / deltaT;
-        // float speedoooooo = ((float)windData.count * (2 * PI) / TICKS_PER_ROTATION) / deltaT;
-
-        // float r = WIND_SENSOR_RADIUS;
-        float rotationsPerT = (windData.count / TICKS_PER_ROTATION);
-        PRINT_DEBUG(" RPM: ");
-        float rpm = (60 * rotationsPerT) / sq(deltaT);
-        PRINT_DEBUG(rpm);
-        // PRINT_DEBUG(" Angular Velocity: ");
-        // float w = rpm * ((2* PI) / 60);
-        // PRINT_DEBUG(w);
-
-        // float angToLin = WIND_SENSOR_RADIUS * w;
-        // speed = angToLin;
-        speed = WIND_SENSOR_RADIUS * rpm * 0.10472;
-        // speed = ticksPerSecond * 2.4;
+        speed = (WIND_SENSOR_RADIUS * PI * windData.count) / deltaT;
         PRINT_DEBUG(" Speed: ");
         PRINT_DEBUG_LN(speed);
         windData.count = 0;

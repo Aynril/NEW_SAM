@@ -29,7 +29,7 @@ struct RadioPacket
 {
   uint16_t propane;
   uint16_t methane;
-  uint16_t smoke;
+  //uint16_t smoke;
   uint16_t hydrogen;
 
   uint8_t rain;
@@ -80,8 +80,8 @@ void loop()
     Serial.println(radioData.propane);
     Serial.print("Methane  ");
     Serial.println(radioData.methane);
-    Serial.print("Smoke    ");
-    Serial.println(radioData.smoke);
+    //Serial.print("Smoke    ");
+    //Serial.println(radioData.smoke);
     Serial.print("Hydrogen ");
     Serial.println(radioData.hydrogen);
     Serial.print("Rain     ");
