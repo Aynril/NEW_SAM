@@ -6,8 +6,8 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 unsigned short site = 0;
 
 char *currentTip = (char *)String("Loading..").c_str();
-int currentTipIndex = 0;
-int currentLineIndex = 0;
+volatile int currentTipIndex = 0;
+volatile int currentLineIndex = 0;
 volatile bool youMayContinue = true;
 
 void printSensorName(String text)
@@ -70,7 +70,12 @@ void shiftIfNeeded()
   {
     currentTipIndex++;
     lcd.setCursor(0, currentLineIndex);
-    lcd.print(currentTip);
+    String toPrint = "";
+    for (int c = 0; c < 20; c++)
+    {
+      toPrint += currentTip[c];
+    }
+    lcd.print(toPrint.c_str());
     return;
   }
 
