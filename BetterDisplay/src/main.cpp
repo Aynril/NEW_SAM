@@ -12,7 +12,7 @@
 #include <ESP8266httpUpdate.h>
 #include <WiFiManager.h>
 
-const String FirmwareVer = {"1.8.3"};
+const String FirmwareVer = {"1.8.4"};
 #define URL_fw_Version "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/versions.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/Aynril/NEW_SAM/platformio/BetterDisplay/firmware.bin"
 
@@ -552,17 +552,21 @@ void espSetup()
   wifiFinishSite();
 
   FirmwareUpdate();
-#ifdef NRF24_SUPPORT
+}
+void timerSetup() {
+  #ifdef NRF24_SUPPORT
   os_timer_setfn(&RadioTimer, radioCallback, NULL);
   os_timer_arm(&RadioTimer, 500, true);
 #endif
 #ifdef I2C_LCD_SUPPORT
   os_timer_setfn(&LCDTimer, lcdCallback, NULL);
   os_timer_arm(&LCDTimer, usualDelay, true);
-  os_timer_setfn(&ScrollTimer, scrollCallback, NULL);
-  os_timer_arm(&ScrollTimer, 600, true);
+  //os_timer_setfn(&ScrollTimer, scrollCallback, NULL);
+  //os_timer_arm(&ScrollTimer, 600, true);
 #endif
 }
+#else
+void timerSetup() {}
 #endif
 
 void setup()
@@ -585,15 +589,24 @@ void setup()
 #if defined(SD_SUPPORT) && defined(__AVR__)
   initSD();
 #endif
-
+  timerSetup();
   Serial.println(F("Init done"));
 }
+
+unsigned long lastTime = 0;
 
 void loop()
 {
 #if defined(NRF24_SUPPORT) && not defined(INTERRUPT_ENABLED) && not defined(ESP8266)
   receivedMessage();
 #endif
+
+  if (millis() - lastTime > 600)
+  {
+    shiftIfNeeded();
+    lastTime = millis();
+  }
+  
 
   delay(10);
 }
